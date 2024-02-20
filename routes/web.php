@@ -16,18 +16,24 @@ use Illuminate\Support\Facades\Storage;
 */
 
 Route::get('/dev', function () {
-    $path = 'Clark';
-//    $url = 'https://www.clarku.edu/all-campus-events';
-    $url = 'https://clark:clarkadmin@www.testing.clarku.edu/all-campus-events';
-//    $title = 'Home-prod';
-    $title = 'Home-test';
-    $service = new BrowserScreenShotService($path);
-    $service->screenshot($url, $title);
+    $path = 'public/Clark/after';
+
+    $urls = [
+        'All-campus-events' => 'https://www.clarku.edu/all-campus-events',
+        'Single-event' => 'https://www.clarku.edu/event/clark-tank-marketing-pitch-competition-application-is-now-open/'
+    ];
+
+    collect($urls)->each(function ($url, $title) use ($path) {
+        $service = new BrowserScreenShotService($path);
+        $service->screenshot($url, $title);
+    });
 });
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/fetch_images', [\App\Http\Controllers\DiffController::class, 'fetchImages']);
 
 Auth::routes();
 
