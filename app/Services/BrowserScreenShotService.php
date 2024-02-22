@@ -58,38 +58,21 @@ class BrowserScreenShotService
         $this->browser->visit($url);
 
         try {
-            //Start by full width and height
-            $dims = $this->browser->script([
-                'let body = document.body;
-                let html = document.documentElement;
-                let totalHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
-                return {width: body.offsetWidth, height: totalHeight};'
-            ]);
-            $bodyWidth = current($dims)['width'];
-            $bodyHeight = current($dims)['height'];
-
-            $size = new WebDriverDimension($bodyWidth, $bodyHeight);
-            $this->browser->driver->manage()->window()->setSize($size);
+            //Start by getting full width and height
+            $dims = $this->getScreenDimensions();
 
             //Resize to full height for a complete screenshot
             $body = $this->browser->driver->findElement(WebDriverBy::tagName('body'));
             if (!empty($body)) {
-                $currentSize = $body->getSize();
-
-                //optional: scroll to bottom and back up, to trigger image lazy loading
-                $this->browser->driver->executeScript('window.scrollTo(0, ' . $currentSize->getHeight() . ');');
                 $this->browser->pause(1000);
-                //scroll back to top of the page
-                $this->browser->driver->executeScript('window.scrollTo(0, 0);');
-
                 //set window to full height
-                $size = new WebDriverDimension($bodyWidth, $bodyHeight);
+                $size = new WebDriverDimension($dims['width'], $dims['height']);
                 $this->browser->driver->manage()->window()->setSize($size);
             }
 
-            $this->browser->pause(3000); //wait for 3s to give everything time to finish loading - probably better to actually check
+            $this->browser->pause(3000);
 
-            $image = $this->browser->driver->TakeScreenshot(); //$image is now the image data in PNG format
+            $image = $this->browser->driver->TakeScreenshot();
 
             //Save the image
             Storage::disk('local')->put($this->saveDirectory . '/screenshots/' . $filename, $image);
@@ -100,5 +83,27 @@ class BrowserScreenShotService
 
             return false;
         }
+    }
+
+    protected function getScreenDimensions(): array
+    {
+        $dims = $this->browser->script([
+               'let body = document.body;
+                let html = document.documentElement;
+                let totalHeight = Math.max(
+                    body.scrollHeight,
+                    body.offsetHeight,
+                    html.clientHeight,
+                    html.scrollHeight,
+                    html.offsetHeight
+                );
+
+                return {width: body.offsetWidth, height: totalHeight};'
+        ]);
+
+        return [
+            'width' => current($dims)['width'],
+            'height' => current($dims)['height'],
+        ];
     }
 }

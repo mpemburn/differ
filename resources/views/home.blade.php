@@ -3,6 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
+        <img src="https://screenie.test/storage/Clark/before/screenshots/All-campus-events.png" style="width: 30%;"/>
         <div class="row">
             <div class="span6 col-6">
                 <div id="dropzone1" class="small-drop-zone">
