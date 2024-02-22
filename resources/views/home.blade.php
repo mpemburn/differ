@@ -13,16 +13,16 @@
 
         <div class="row">
             <div class="span6 col-6">
-                <div id="dropzone1" class="small-drop-zone">
-                    Drop first image
+                <div id="before-image" class="small-drop-zone">
+                    Before Screenshot
                 </div>
-                <div id="dropzone2" class="small-drop-zone">
-                    Drop second image
+                <div id="after-image" class="small-drop-zone">
+                    After Screenshot
                 </div>
             </div>
             <div class="span6 col-6">
                 <div id="image-diff" class="small-drop-zone">
-                    Diff will appear here.
+                    Difference.
                 </div>
                 <br>
             </div>

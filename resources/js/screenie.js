@@ -11,17 +11,16 @@ $(document).ready(function ($) {
             let self = this;
 
             this.images.on('click', function () {
-                let image = $(this);
-                let name = image.data('name')
-                let src1 = image.data('url');
+                let image1 = $(this);
+                let name = image1.data('name')
                 let image2 = $('[data-name="' + name + '"][data-when="after"]');
+                let src1 = image1.data('url');
                 let src2 = image2.data('url');
 
                 $("#image-diff").html('');
-                // self.diffImage.empty();
 
-                $("#dropzone1").html('<img src="' + src1 + '"/>');
-                $("#dropzone2").html('<img src="' + src2 + '"/>');
+                $("#before-image").html('<img src="' + src1 + '" alt="before"/>');
+                $("#after-image").html('<img src="' + src2 + '" alt="after"/>');
 
                 self.clearData();
                 self.getFileData(src1, 'before');
