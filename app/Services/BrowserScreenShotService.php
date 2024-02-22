@@ -5,13 +5,10 @@
  */
 namespace App\Services;
 
-use App\Facades\Curl;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverDimension;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Dusk\Browser;
 use Laravel\Dusk\Chrome\ChromeProcess;
@@ -20,6 +17,8 @@ use Facebook\WebDriver\Exception\UnknownErrorException;
 
 class BrowserScreenShotService
 {
+    const DEFAULT_BROWSER_WIDTH = 1920;
+
     protected $browser;
     protected string $saveDirectory;
 
@@ -58,23 +57,19 @@ class BrowserScreenShotService
         $this->browser->visit($url);
 
         try {
-            //Start by getting full width and height
-            $dims = $this->getScreenDimensions();
+            // Calculate screen height
+            $screenHeight = $this->getScreenHeight();
 
-            //Resize to full height for a complete screenshot
-            $body = $this->browser->driver->findElement(WebDriverBy::tagName('body'));
-            if (!empty($body)) {
-                $this->browser->pause(1000);
-                //set window to full height
-                $size = new WebDriverDimension($dims['width'], $dims['height']);
-                $this->browser->driver->manage()->window()->setSize($size);
-            }
+            $this->browser->pause(1000);
+            // Set dimensions for screenshot
+            $size = new WebDriverDimension(self::DEFAULT_BROWSER_WIDTH, $screenHeight);
+            $this->browser->driver->manage()->window()->setSize($size);
 
             $this->browser->pause(3000);
 
             $image = $this->browser->driver->TakeScreenshot();
 
-            //Save the image
+            // Save the image
             Storage::disk('local')->put($this->saveDirectory . '/screenshots/' . $filename, $image);
 
             return file_exists($filePath);
@@ -85,10 +80,10 @@ class BrowserScreenShotService
         }
     }
 
-    protected function getScreenDimensions(): array
+    protected function getScreenHeight(): int
     {
         $dims = $this->browser->script([
-               'let body = document.body;
+            'let body = document.body;
                 let html = document.documentElement;
                 let totalHeight = Math.max(
                     body.scrollHeight,
@@ -98,12 +93,9 @@ class BrowserScreenShotService
                     html.offsetHeight
                 );
 
-                return {width: body.offsetWidth, height: totalHeight};'
+                return {height: totalHeight};'
         ]);
 
-        return [
-            'width' => current($dims)['width'],
-            'height' => current($dims)['height'],
-        ];
+        return current($dims)['height'];
     }
 }
