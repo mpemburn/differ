@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\Image;
 use Illuminate\Support\Facades\Route;
 use App\Services\BrowserScreenShotService;
 use Illuminate\Support\Facades\Storage;
@@ -15,16 +16,24 @@ use Illuminate\Support\Facades\Storage;
 |
 */
 
+Route::get('/images', function () {
+    $files = Image::getScreenshots('Clark');
+
+    dd($files);
+});
+
 Route::get('/dev', function () {
     $path = 'public/Clark/after';
 
     $urls = [
-        'All-campus-events' => 'https://www.clarku.edu/all-campus-events',
-        'Single-event' => 'https://www.clarku.edu/event/clark-tank-marketing-pitch-competition-application-is-now-open/'
+        'https://www.clarku.edu/all-campus-events',
+        'https://www.clarku.edu/event/clark-tank-marketing-pitch-competition-application-is-now-open'
     ];
 
-    collect($urls)->each(function ($url, $title) use ($path) {
+    collect($urls)->each(function ($url) use ($path) {
         $service = new BrowserScreenShotService($path);
+        $parts = explode('/', $url);
+        $title = array_pop($parts);
         $service->screenshot($url, $title);
     });
 });

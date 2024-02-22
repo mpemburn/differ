@@ -47,7 +47,7 @@ class BrowserScreenShotService
     public function screenshot(string $url, string $title): bool
     {
         $filename = str_replace(' ', '', $title) . '.png';
-        $filePath = Storage::path($this->saveDirectory . '/screenshots/') . '/' . $filename;
+        $filePath = Storage::path($this->saveDirectory) . '/' . $filename;
 
         // If we've created the file already, no need to redo
         if (file_exists($filePath)) {
@@ -70,7 +70,7 @@ class BrowserScreenShotService
             $image = $this->browser->driver->TakeScreenshot();
 
             // Save the image
-            Storage::disk('local')->put($this->saveDirectory . '/screenshots/' . $filename, $image);
+            Storage::disk('local')->put($this->saveDirectory . '/' . $filename, $image);
 
             return file_exists($filePath);
         } catch (\Exception $e) {
