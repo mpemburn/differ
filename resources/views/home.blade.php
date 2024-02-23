@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="row">
-            <div id="file_list" class="span6 col-2">
+            <div id="file_list" class="span6 col-md-2">
                 <h4>Files:</h4>
                 <ul class="file-list">
                     @foreach(App\Facades\Image::getScreenshots('Clark') as $image => $when)
@@ -15,7 +15,7 @@
                     @endforeach
                 </ul>
             </div>
-            <div id="image_area" class="col-4">
+            <div id="image_area" class="col-md-4">
                 <div id="title_area">
                     <button id="clear_button" type="button" class="btn btn-sm">Clear</button>
                     <span id="comparing"></span>
@@ -27,7 +27,7 @@
                     After Screenshot
                 </div>
             </div>
-            <div id="diff_area" class="col-6">
+            <div id="diff_area" class="col-md-6">
                 <div id="diff_image" class="image-zone">
                     Difference
                 </div>

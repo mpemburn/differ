@@ -22,7 +22,7 @@
     min-width: 50%;
 }
 
-#image_area, {
+#image_area {
     padding-left: 1.5rem;
 }
 
@@ -60,7 +60,8 @@
 }
 
 .after {
-    display: none;
+    height: 0;
+    visibility: hidden;
 }
 
 #diff_msg {

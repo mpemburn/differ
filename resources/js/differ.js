@@ -1,7 +1,7 @@
 $(document).ready(function ($) {
     class Differ {
         constructor() {
-            this.fileList = $('#file_list');
+            this.fileListArea = $('#file_list');
             this.imageArea = $('#image_area');
             this.diffArea = $('#diff_area');
             this.images = $('.test-image');
@@ -40,18 +40,18 @@ $(document).ready(function ($) {
                 self.clearData();
                 self.getFileData(src1, 'before');
                 self.getFileData(src2, 'after');
-                self.fileList.removeClass('mouse-over');
+                self.fileListArea.removeClass('mouse-over');
                 self.imageArea.removeClass('push-right')
                 self.diffArea.removeClass('push-right')
             });
 
-            this.fileList.on('mouseover', function () {
-                $(this).addClass('mouse-over');
+            this.fileListArea.find('ul').on('mouseover', function () {
+                self.fileListArea.addClass('mouse-over');
                 self.imageArea.addClass('push-right')
                 self.diffArea.addClass('push-right')
 
             }).on('mouseout', function () {
-                $(this).removeClass('mouse-over');
+                self.fileListArea.removeClass('mouse-over');
                 self.imageArea.removeClass('push-right')
                 self.diffArea.removeClass('push-right')
             });
