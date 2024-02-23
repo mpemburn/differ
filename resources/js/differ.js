@@ -1,9 +1,21 @@
 $(document).ready(function ($) {
     class Differ {
         constructor() {
+            this.fileList = $('#file_list');
+            this.imageArea = $('#image_area');
+            this.diffArea = $('#diff_area');
             this.images = $('.test-image');
-            this.diffImage = $("#image-diff");
+            this.zones = $('.image-zone');
+            this.diffImage = $('#diff_image');
+            this.diffMessage = $('#diff_msg');
+            this.comparing = $('#comparing');
+            this.clearButton = $('#clear_button');
             this.fileData = {};
+            this.labels = {
+                before_image: 'Before Screenshot',
+                after_image: 'After Screenshot',
+                diff_image: 'Difference'
+            };
             this.addListeners();
         }
 
@@ -17,14 +29,44 @@ $(document).ready(function ($) {
                 let src1 = image1.data('url');
                 let src2 = image2.data('url');
 
-                $("#image-diff").html('');
+                self.diffImage.html('');
+                self.comparing.html('Comparing: ' + name);
+                self.clearButton.show();
+                self.diffMessage.show();
 
-                $("#before-image").html('<img src="' + src1 + '" alt="before"/>');
-                $("#after-image").html('<img src="' + src2 + '" alt="after"/>');
+                $("#before_image").html('<img src="' + src1 + '" alt="before"/>');
+                $("#after_image").html('<img src="' + src2 + '" alt="after"/>');
 
                 self.clearData();
                 self.getFileData(src1, 'before');
                 self.getFileData(src2, 'after');
+                self.fileList.removeClass('mouse-over');
+                self.imageArea.removeClass('push-right')
+                self.diffArea.removeClass('push-right')
+            });
+
+            this.fileList.on('mouseover', function () {
+                $(this).addClass('mouse-over');
+                self.imageArea.addClass('push-right')
+                self.diffArea.addClass('push-right')
+
+            }).on('mouseout', function () {
+                $(this).removeClass('mouse-over');
+                self.imageArea.removeClass('push-right')
+                self.diffArea.removeClass('push-right')
+            });
+
+            this.clearButton.on('click', function () {
+                self.zones.each(function () {
+                    let zone = $(this);
+                    let id = zone.attr('id');
+
+                    zone.empty()
+                    zone.html(self.labels[id]);
+                });
+                self.comparing.empty();
+                self.diffMessage.hide();
+                self.clearButton.hide();
             });
         }
 
@@ -61,9 +103,10 @@ $(document).ready(function ($) {
             diffImage.src = data.getImageDataUrl();
             console.log(data);
 
-            $("#image-diff").html(diffImage);
+            $("#diff_image").html(diffImage);
+            $("#percentage").html('The "after" image differs from the "before" image by ' + data.misMatchPercentage + '%');
 
-            $(diffImage).click(function() {
+            $(diffImage).addClass('difference').click(function() {
                 var w = window.open("about:blank", "_blank");
                 var html = w.document.documentElement;
                 var body = w.document.body;

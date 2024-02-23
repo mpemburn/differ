@@ -3,28 +3,38 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-
-        @foreach(App\Facades\Image::getScreenshots('Clark') as $image => $when)
-            <?php $name = App\Facades\Image::getName($image) ?>
-            <div class="test-image {{ $when }}" data-when="{{ $when }}" data-name="{{ $name }}" data-url="{{  asset('storage/' . $image) }}">
-                {{ $name }}
-            </div>
-        @endforeach
-
         <div class="row">
-            <div class="span6 col-6">
-                <div id="before-image" class="small-drop-zone">
+            <div id="file_list" class="span6 col-2">
+                <h4>Files:</h4>
+                <ul class="file-list">
+                    @foreach(App\Facades\Image::getScreenshots('Clark') as $image => $when)
+                            <?php $name = App\Facades\Image::getName($image) ?>
+                        <li class="test-image {{ $when }}" data-when="{{ $when }}" data-name="{{ $name }}" data-url="{{  asset('storage/' . $image) }}">
+                            {{ $name }}
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+            <div id="image_area" class="col-4">
+                <div id="title_area">
+                    <button id="clear_button" type="button" class="btn btn-sm">Clear</button>
+                    <span id="comparing"></span>
+                </div>
+                <div id="before_image" class="image-zone">
                     Before Screenshot
                 </div>
-                <div id="after-image" class="small-drop-zone">
+                <div id="after_image" class="image-zone">
                     After Screenshot
                 </div>
             </div>
-            <div class="span6 col-6">
-                <div id="image-diff" class="small-drop-zone">
-                    Difference.
+            <div id="diff_area" class="col-6">
+                <div id="diff_image" class="image-zone">
+                    Difference
                 </div>
-                <br>
+                <div id="diff_msg">
+                    Click on the image above to open in a new tab.
+                    <div id="percentage"></div>
+                </div>
             </div>
         </div>
 @endsection

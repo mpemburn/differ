@@ -1,6 +1,85 @@
+#file_list {
+    z-index: 99;
+    height: 100%;
+    padding-top: 0.5rem;
+    padding-right: 0.5rem;
+    overflow: hidden;
+    box-shadow: 10px 0 5px #eeeeee;
+    background-color: #ffffff;
+
+    ul li {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 50px;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.mouse-over {
+    position: absolute;
+    min-width: 50%;
+}
+
+#image_area, {
+    padding-left: 1.5rem;
+}
+
+.push-right {
+    position: relative;
+    left: 40rem;
+}
+
+.image-zone {
+    margin-top: 2rem;
+    border: 8px solid #ccc;
+    color: #ccc;
+    font-size: 32px;
+    height: 330px;
+    line-height: 330px;
+    text-align: center;
+    width: 330px;
+    overflow: hidden;
+    position: relative;
+}
+
+.image-zone img {
+    width: 330px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.difference {
+    cursor: pointer;
+}
+
 .test-image {
     cursor: pointer;
 }
+
 .after {
     display: none;
+}
+
+#diff_msg {
+    display: none;
+}
+
+#title_area {
+    position: absolute;
+    min-width: 100%;
+    padding-bottom: 1rem;
+    white-space: nowrap;
+}
+
+#comparing {
+    white-space: nowrap;
+}
+
+#clear_button {
+    display: none;
+    border: 1px solid #111111;
+    padding: 2px 4px;
 }
