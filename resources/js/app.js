@@ -1,4 +1,4 @@
 import './bootstrap';
-import './screenie';
+import './differ.js';
 // import './dropzone';
 

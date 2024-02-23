@@ -1,5 +1,5 @@
 $(document).ready(function ($) {
-    class Screenie {
+    class Differ {
         constructor() {
             this.images = $('.test-image');
             this.diffImage = $("#image-diff");
@@ -86,5 +86,5 @@ $(document).ready(function ($) {
         }
     }
 
-    new Screenie();
+    new Differ();
 });
