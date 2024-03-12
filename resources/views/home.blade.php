@@ -4,16 +4,21 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="row">
-            <div id="file_list" class="span6 col-md-2">
-                <h4>Files:</h4>
-                <ul class="file-list">
+            <div >
+                <h4>Screenshots:</h4>
+                <select id="screenshots">
+                    <option value="">Select Screenshot to Test</option>
                     @foreach(App\Facades\Image::getScreenshots('Clark') as $image => $when)
                             <?php $name = App\Facades\Image::getName($image) ?>
-                        <li class="test-image {{ $when }}" data-when="{{ $when }}" data-name="{{ $name }}" data-url="{{  asset('storage/' . $image) }}">
+                            @if ($when === 'before')
+                                <option {{ $when }}" data-when="{{ $when }}" data-name="{{ $name }}" data-url="{{  asset('storage/' . $image) }}">
+                            @else
+                                <option class="hidden" {{ $when }}" data-when="{{ $when }}" data-name="{{ $name }}" data-url="{{  asset('storage/' . $image) }}">
+                            @endif
                             {{ $name }}
-                        </li>
+                        </option>
                     @endforeach
-                </ul>
+                </select>
             </div>
             <div id="image_area" class="col-md-4">
                 <div id="title_area">

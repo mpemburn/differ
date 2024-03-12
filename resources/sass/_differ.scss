@@ -1,20 +1,9 @@
-#file_list {
-    z-index: 99;
-    height: 100%;
-    padding-top: 0.5rem;
-    padding-right: 0.5rem;
-    overflow: hidden;
-    box-shadow: 10px 0 5px #eeeeee;
-    background-color: #ffffff;
+#screenshots {
+    margin-bottom: 0.5rem;
+}
 
-    ul li {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        max-width: 50px;
-        &:hover {
-            text-decoration: underline;
-        }
-    }
+option.hidden {
+    display: none;
 }
 
 .mouse-over {

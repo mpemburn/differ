@@ -16,6 +16,21 @@ use Illuminate\Support\Facades\Storage;
 |
 */
 
+Route::get('/num', function () {
+    $nums = Storage::path('public/dirs.txt');
+    if (file_exists($nums)) {
+        $contents = file_get_contents($nums);
+        $array = explode("\n", $contents);
+
+        natsort($array);
+
+        collect($array)->each(function ($item) {
+            echo $item . '<br>';
+        });
+    }
+
+});
+
 Route::get('/images', function () {
     $files = Image::getScreenshots('Clark');
 
