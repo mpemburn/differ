@@ -11,7 +11,7 @@
                     @foreach(App\Facades\Image::getScreenshots('Clark') as $image => $when)
                             <?php $name = App\Facades\Image::getName($image) ?>
                             @if ($when === 'before')
-                                <option {{ $when }}" data-when="{{ $when }}" data-name="{{ $name }}" data-url="{{  asset('storage/' . $image) }}">
+                                <option value="{{ $loop->index }}"{{ $when }}" data-when="{{ $when }}" data-name="{{ $name }}" data-url="{{  asset('storage/' . $image) }}">
                             @else
                                 <option class="hidden" {{ $when }}" data-when="{{ $when }}" data-name="{{ $name }}" data-url="{{  asset('storage/' . $image) }}">
                             @endif

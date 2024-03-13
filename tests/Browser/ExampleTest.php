@@ -16,15 +16,13 @@ class ExampleTest extends DuskTestCase
     public function testBasicExample(): void
     {
         $this->browse(function (Browser $browser) {
-            $browser->visit('https://www.clarku.edu/all-campus-events')
-                ->assertSee('Clark');
-            $height = $browser->script([
-                'let body = document.body;
-                let html = document.documentElement;
-                let totalHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
-                return {width: body.offsetWidth, height: totalHeight};'
-            ]);
-            var_dump(current($height)['height']);
+            $browser->visit('https://news.test.clarku.edu/academic-affairs')
+                ->assertSee('Sign in with your organizational account');
+
+            $browser->type('UserName', 'mpemburn@clarku.edu')
+                ->type('Password', 'wildPl@nner')
+                ->press('#submitButton')
+                ->pause(3000);
         });
     }
 }

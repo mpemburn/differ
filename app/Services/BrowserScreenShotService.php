@@ -5,13 +5,16 @@
  */
 namespace App\Services;
 
+use Exception;
 use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverDimension;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Dusk\Browser;
 use Laravel\Dusk\Chrome\ChromeProcess;
+use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Facebook\WebDriver\Exception\UnknownErrorException;
 
@@ -27,6 +30,7 @@ class BrowserScreenShotService
         $this->saveDirectory = trim($saveDirectory);
 
         try {
+
             //Make a Chrome browser
             $process = (new ChromeProcess)->toProcess();
             $process->start();
@@ -44,9 +48,31 @@ class BrowserScreenShotService
         }
     }
 
+    public function login (string $url): self
+    {
+        try {
+            $this->browser->visit($url)
+                ->waitForText(env('ADFS_SIGN_ON_TEXT'));
+        } catch (Exception $e) {
+            return $this;
+        }
+
+        $this->browser->type('UserName', env('ADFS_USER_EMAIL'))
+            ->type('Password', env('ADFS_USER_PASSWORD'))
+            ->press('#submitButton')
+            ->pause(3000);
+
+        return $this;
+    }
+
     public function screenshot(string $url, string $title): bool
     {
-        $filename = str_replace(' ', '', $title) . '.png';
+        if (empty($url)) {
+            echo 'No URL provided.' . PHP_EOL;
+            return false;
+        }
+
+        $filename = str_replace(' ', '', $title) . 'unknown.png';
         $filePath = Storage::path($this->saveDirectory) . '/' . $filename;
 
         // If we've created the file already, no need to redo
@@ -75,6 +101,7 @@ class BrowserScreenShotService
             return file_exists($filePath);
         } catch (\Exception $e) {
             echo 'Exception occurred creating screenshot for ' . $url . PHP_EOL;
+            echo $e->getMessage() . PHP_EOL;
 
             return false;
         }
