@@ -33,20 +33,33 @@ class ScanUrlsCommand extends Command
         $when = $this->option('when');
 
         $testUrls = Storage::path('public/URLs/' . $test);
-//        $urlArray = ['https://news.test.clarku.edu/international-center-blog'];
         $urlArray = Reader::getContentsAsArray($testUrls);
 
-        $path = 'public/' . $path. '/' . $when;
+        if ($this->process($path, $when, $urlArray)) {
+            $retry = Storage::path('retry.txt');
+            $retryArray = Reader::getContentsAsArray($retry);
+            if (! empty($retryArray)) {
+                $this->process($path, $when, $retryArray);
+            }
+        }
+    }
 
+    protected function process(string $path, string $when, array $urls): bool
+    {
+        Storage::delete('retry.txt');
+
+        $path = 'public/screenshots/' . $path. '/' . $when;
         $service = new BrowserScreenShotService($path);
 
-        collect($urlArray)->each(function ($url) use ($service) {
+        collect($urls)->each(function ($url) use ($service) {
             echo 'Scanning: ' . $url . PHP_EOL;
 
-            $parts = explode('/', $url);
-            $title = array_pop($parts);
+            $parts = parse_url($url);
+            $title = str_replace('/', '', $parts['path']);
 
             $service->login($url)->screenshot($url, $title);
         });
+
+        return ! file_exists(Storage::path('retry.txt'));
     }
 }

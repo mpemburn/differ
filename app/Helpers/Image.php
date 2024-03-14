@@ -8,15 +8,19 @@ class Image
 {
     public function getScreenshots(string $directory): array
     {
+        $index = 0;
         $files = Storage::disk('public')->allFiles($directory);
         $result = [];
-        collect($files)->each(function ($file) use (&$result) {
+        collect($files)->each(function ($file) use (&$index, &$result) {
             if (str_contains($file, '.DS_Store')) {
                 return null;
             }
-            $when = str_contains($file, 'before') ? 'before' : 'after';
+            $when = str_contains($file, '/before/') ? 'before' : 'after';
+            if ($when === 'before') {
+                $index++;
+            }
 
-            $result[$file] = $when;
+            $result[$file] = ['when' => $when, 'index' => $index];
         })->filter();
 
         return $result;

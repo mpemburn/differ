@@ -1,6 +1,11 @@
 <?php
 
 use App\Facades\Image;
+use App\Facades\Reader;
+use App\Http\Controllers\DiffController;
+use App\Http\Controllers\HomeController;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Services\BrowserScreenShotService;
 use Illuminate\Support\Facades\Storage;
@@ -38,27 +43,23 @@ Route::get('/images', function () {
 });
 
 Route::get('/dev', function () {
-    $path = 'public/Clark/after';
+    $directories = Storage::directories('public/screenshots');
 
-    $urls = [
-        'https://www.clarku.edu/all-campus-events',
-        'https://www.clarku.edu/event/clark-tank-marketing-pitch-competition-application-is-now-open'
-    ];
-
-    collect($urls)->each(function ($url) use ($path) {
-        $service = new BrowserScreenShotService($path);
-        $parts = explode('/', $url);
-        $title = array_pop($parts);
-        $service->screenshot($url, $title);
+    $dirs = collect($directories)->map(function ($directory) {
+        $timestamp = Storage::lastModified($directory);
+        $date = Carbon::createFromTimestamp($timestamp)->format('m/d/Y');
+        return [$directory => $date];
     });
+
+    !d($dirs);
 });
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/fetch_images', [\App\Http\Controllers\DiffController::class, 'fetchImages']);
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/fetch_images', [DiffController::class, 'fetchImages']);
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

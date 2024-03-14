@@ -3,6 +3,7 @@ $(document).ready(function ($) {
     class Differ {
         constructor() {
             this.screenshotList = $('#screenshots');
+            this.loading = $('#loading');
             this.imageArea = $('#image_area');
             this.diffArea = $('#diff_area');
             this.images = $('.test-image');
@@ -18,31 +19,61 @@ $(document).ready(function ($) {
                 diff_image: 'Difference'
             };
             this.currentImage = null;
+            this.currentItem = this.getQueryValue('item')
+            this.autoMode = this.getQueryValue('auto') === 'true';
+            this.nextItem = this.getNextItem();
 
             this.addListeners();
 
             this.routeByQueryParam();
         }
 
-        routeByQueryParam() {
+        getQueryValue(key) {
             let queryString = window.location.search;
             let urlParams = new URLSearchParams(queryString);
 
+            return urlParams.get(key);
+        }
+
+        routeByQueryParam() {
             switch (true) {
-                case urlParams.get('auto') === 'true':
-                    this.doAutoScan();
+                case this.currentItem.length > 0:
+                    this.processItem(this.currentItem);
+                    break;
             }
         }
 
-        doAutoScan() {
-            let self = this;
+        processItem(itemNumber) {
+            let image = this.screenshotList.find('option[value="' + itemNumber+ '"]');
+            let name = image.is('*') ? image.data('name') : null;
+            if (name) {
+                this.compareImages(name);
+            }
+        }
 
-            this.images.each(function () {
-                let when = $(this).data('when');
-                if (when === 'before') {
-                    $(this).trigger('click');
+        getNextItem() {
+            let params = window.location.search.split('&');
+            let newParams = [];
+
+            params.forEach(function (value) {
+                if (value.includes('item=')) {
+                    let valParts = value.split('=');
+                    let current = parseInt(valParts[1])
+                    let next = current + 1;
+                    value = 'item=' + next;
                 }
-            })
+                newParams.push(value);
+            });
+
+            return newParams.join('&');
+        }
+
+        loadNext() {
+            if (this.autoMode && this.currentItem < $('option[value]').length) {
+                window.location = window.location.origin + window.location.pathname + this.nextItem;
+            } else {
+                alert('that is all!');
+            }
         }
 
         saveResults(filename, data) {
@@ -77,6 +108,28 @@ $(document).ready(function ($) {
                 });
         }
 
+        compareImages(name) {
+            let image1 = $('[data-name="' + name + '"][data-when="before"]');
+            let image2 = $('[data-name="' + name + '"][data-when="after"]');
+            let src1 = image1.data('url');
+            let src2 = image2.data('url');
+
+            this.currentImage = name;
+            this.diffImage.html('');
+            this.comparing.html('Comparing: ' + name);
+            this.clearButton.show();
+            this.diffMessage.show();
+            this.loading.show();
+
+            $("#before_image").html('<img src="' + src1 + '" alt="before"/>');
+            $("#after_image").html('<img src="' + src2 + '" alt="after"/>');
+
+            //this.clearData();
+            this.getFileData(name, src1, 'before');
+            this.getFileData(name, src2, 'after');
+
+        }
+
         processData() {
             this.currentImage = this.fileData.name;
             resemble(this.fileData.before)
@@ -84,29 +137,12 @@ $(document).ready(function ($) {
                 .onComplete(this.onComplete);
         }
 
-
         addListeners() {
             let self = this;
 
             this.screenshotList.on('change', function () {
-                let name = $(this).val();
-                let image1 = $('[data-name="' + name + '"][data-when="before"]');
-                let image2 = $('[data-name="' + name + '"][data-when="after"]');
-                let src1 = image1.data('url');
-                let src2 = image2.data('url');
-
-                self.currentImage = name;
-                self.diffImage.html('');
-                self.comparing.html('Comparing: ' + name);
-                self.clearButton.show();
-                self.diffMessage.show();
-
-                $("#before_image").html('<img src="' + src1 + '" alt="before"/>');
-                $("#after_image").html('<img src="' + src2 + '" alt="after"/>');
-
-                //self.clearData();
-                self.getFileData(name, src1, 'before');
-                self.getFileData(name, src2, 'after');
+                let name = $(this).find("option:selected").data('name');
+                self.compareImages(name)
             });
 
             this.clearButton.on('click', function () {
@@ -132,6 +168,7 @@ $(document).ready(function ($) {
 
             // console.log(window.Differ.currentImage);
             window.Differ.saveResults(window.Differ.currentImage, data);
+            window.Differ.loading.hide();
 
             $("#diff_image").html(diffImage);
             $("#percentage").html('The "after" image differs from the "before" image by ' + data.misMatchPercentage + '%');
@@ -159,6 +196,7 @@ $(document).ready(function ($) {
 
             data = null;
             window.Differ.clearData();
+            window.Differ.loadNext();
         }
     }
 
