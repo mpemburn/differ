@@ -19,11 +19,11 @@ class HomeController extends Controller
 
     public function index()
     {
-        $testDir = request('test');
+        $sourceDir = request('source');
         $item = request('item');
 
         return view('home', [
-            'dir' => 'screenshots/' . $testDir,
+            'dir' => 'screenshots/' . $sourceDir,
             'item' => $item,
         ]);
     }

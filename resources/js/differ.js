@@ -19,13 +19,13 @@ $(document).ready(function ($) {
                 diff_image: 'Difference'
             };
             this.currentImage = null;
-            this.currentItem = this.getQueryValue('item')
+            this.currentItem = this.getQueryValue('item');
             this.autoMode = this.getQueryValue('auto') === 'true';
             this.nextItem = this.getNextItem();
 
             this.addListeners();
 
-            this.routeByQueryParam();
+            this.runAutoMode();
         }
 
         getQueryValue(key) {
@@ -35,11 +35,9 @@ $(document).ready(function ($) {
             return urlParams.get(key);
         }
 
-        routeByQueryParam() {
-            switch (true) {
-                case this.currentItem.length > 0:
-                    this.processItem(this.currentItem);
-                    break;
+        runAutoMode() {
+            if (this.currentItem && this.currentItem.length > 0) {
+                this.processItem(this.currentItem);
             }
         }
 
@@ -72,27 +70,49 @@ $(document).ready(function ($) {
             if (this.autoMode && this.currentItem < $('option[value]').length) {
                 window.location = window.location.origin + window.location.pathname + this.nextItem;
             } else {
-                alert('that is all!');
+                //alert('that is all!');
             }
         }
 
         saveResults(filename, data) {
             console.log(filename);
             console.log(data);
+            this.ajaxSetup()
+            $.ajax({
+                type: "POST",
+                url: "/save_results",
+                data: $.param({
+                    source: this.getQueryValue('source'),
+                    filename: filename,
+                    percentage: data.misMatchPercentage
+                }),
+                processData: false,
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (msg) {
+                    console.log(msg);
+                }
+            });
+        }
+
+        ajaxSetup() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
         }
 
         clearData() {
-            console.log('Before clear: ');
-            console.log(this.fileData);
             this.fileData = {
                 name: null,
                 before: null,
                 after: null
             };
-            console.log('After clear: ');
-            console.log(this.fileData);
         }
 
+        // Retrieve binary file data and process it
         getFileData(filename, imgSrc, when) {
             let self = this;
 
@@ -127,7 +147,6 @@ $(document).ready(function ($) {
             //this.clearData();
             this.getFileData(name, src1, 'before');
             this.getFileData(name, src2, 'after');
-
         }
 
         processData() {
@@ -161,14 +180,15 @@ $(document).ready(function ($) {
         }
 
         onComplete(data) {
+            let differ = window.Differ;
             let time = Date.now();
             let diffImage = new Image();
             diffImage.src = data.getImageDataUrl();
             //console.log(data);
 
             // console.log(window.Differ.currentImage);
-            window.Differ.saveResults(window.Differ.currentImage, data);
-            window.Differ.loading.hide();
+            differ.saveResults(differ.currentImage, data);
+            differ.loading.hide();
 
             $("#diff_image").html(diffImage);
             $("#percentage").html('The "after" image differs from the "before" image by ' + data.misMatchPercentage + '%');
@@ -195,8 +215,8 @@ $(document).ready(function ($) {
             });
 
             data = null;
-            window.Differ.clearData();
-            window.Differ.loadNext();
+            differ.clearData();
+            differ.loadNext();
         }
     }
 

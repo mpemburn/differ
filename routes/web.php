@@ -60,6 +60,7 @@ Route::get('/', function () {
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/fetch_images', [DiffController::class, 'fetchImages']);
+Route::post('/save_results', [DiffController::class, 'saveResults']);
 
 Auth::routes();
 

@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DiffService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class DiffController extends Controller
 {
+    protected DiffService $diffService;
+
+    public function __construct(DiffService $diffService)
+    {
+        $this->diffService = $diffService;
+    }
+
     public function fetchImages()
     {
         $data = [];
@@ -24,5 +31,12 @@ class DiffController extends Controller
         });
 
         return response()->json(['images' => $data]);
+    }
+
+    public function saveResults(Request $request)
+    {
+        $this->diffService->saveComparison();
+
+        return response()->json(['success' => true]);
     }
 }
