@@ -43,13 +43,7 @@ Route::get('/images', function () {
 });
 
 Route::get('/dev', function () {
-    $directories = Storage::directories('public/screenshots');
-
-    $dirs = collect($directories)->map(function ($directory) {
-        $timestamp = Storage::lastModified($directory);
-        $date = Carbon::createFromTimestamp($timestamp)->format('m/d/Y');
-        return [$directory => $date];
-    });
+    $dirs = (new \App\Services\DiffService())->getSources();
 
     !d($dirs);
 });

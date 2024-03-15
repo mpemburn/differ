@@ -10,10 +10,22 @@ use Illuminate\Support\Facades\Storage;
 
 class DiffService
 {
+    public const SOURCE_DIRECTORY = 'public/screenshots';
+    public function getSources(): array
+    {
+        $directories = Storage::directories(self::SOURCE_DIRECTORY);
+
+         return collect($directories)->map(function ($directory) {
+            $timestamp = Storage::lastModified($directory);
+            $dirName = str_replace(self::SOURCE_DIRECTORY . '/', '', $directory);
+            $date = Carbon::createFromTimestamp($timestamp)->format('m/d/Y');
+            return [$dirName => $date];
+        })->toArray();
+    }
 
     public function getScreenshotDirectories(): array
     {
-        $directories = Storage::directories('public/screenshots');
+        $directories = Storage::directories(self::SOURCE_DIRECTORY);
 
         return collect($directories)->map(function ($directory) {
             $timestamp = Storage::lastModified($directory);
@@ -43,7 +55,7 @@ class DiffService
 
     protected function getFileDate(string $source, string $filename, string $when): ?string
     {
-        $filepath = Storage::path("public/screenshots/{$source}/{$when}/{$filename}");
+        $filepath = Storage::path("{self::SOURCE_DIRECTORY}/{$source}/{$when}/{$filename}");
         if (file_exists($filepath)) {
             $timestamp = File::lastModified($filepath);
 

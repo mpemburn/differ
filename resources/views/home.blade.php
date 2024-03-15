@@ -4,9 +4,9 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="row">
-                <div>
+                <div id="select_screenshot">
                     <h4>Screenshots:</h4>
-                    <select id="screenshots">{{ $dir }}
+                    <select id="screenshots">
                         <option value="">Select Screenshot to Test</option>
                         @foreach(App\Facades\Image::getScreenshots($dir) as $image => $data)
                             <?php $name = App\Facades\Image::getName($image) ?>

@@ -4,6 +4,8 @@ $(document).ready(function ($) {
         constructor() {
             this.screenshotList = $('#screenshots');
             this.loading = $('#loading');
+            this.selectScreenshot = $('#select_screenshot');
+            this.titleArea = $('#title_area');
             this.imageArea = $('#image_area');
             this.diffArea = $('#diff_area');
             this.images = $('.test-image');
@@ -22,10 +24,13 @@ $(document).ready(function ($) {
             this.currentItem = this.getQueryValue('item');
             this.autoMode = this.getQueryValue('auto') === 'true';
             this.nextItem = this.getNextItem();
+            this.imageCount = $('option[value]').length;
 
             this.addListeners();
 
-            this.runAutoMode();
+            if (this.autoMode) {
+                this.runAutoMode();
+            }
         }
 
         getQueryValue(key) {
@@ -36,7 +41,12 @@ $(document).ready(function ($) {
         }
 
         runAutoMode() {
+            if (! this.currentItem) {
+                window.location = window.location.href + '&item=1';
+            }
             if (this.currentItem && this.currentItem.length > 0) {
+                this.selectScreenshot.hide();
+                this.titleArea.hide();
                 this.processItem(this.currentItem);
             }
         }
@@ -50,6 +60,10 @@ $(document).ready(function ($) {
         }
 
         getNextItem() {
+            if (! this.autoMode) {
+                return;
+            }
+            let self = this;
             let params = window.location.search.split('&');
             let newParams = [];
 
@@ -58,7 +72,12 @@ $(document).ready(function ($) {
                     let valParts = value.split('=');
                     let current = parseInt(valParts[1])
                     let next = current + 1;
-                    value = 'item=' + next;
+                    if (value.includes('item=') && next >= $('option[value]').length) {
+                        self.haltAutoMode();
+                        return;
+                    } else {
+                        value = 'item=' + next;
+                    }
                 }
                 newParams.push(value);
             });
@@ -67,16 +86,26 @@ $(document).ready(function ($) {
         }
 
         loadNext() {
-            if (this.autoMode && this.currentItem < $('option[value]').length) {
+            if (this.autoMode && this.currentItem < this.imageCount) {
                 window.location = window.location.origin + window.location.pathname + this.nextItem;
             } else {
-                //alert('that is all!');
+                this.selectScreenshot.show();
+                this.titleArea.show();
             }
         }
 
+        haltAutoMode() {
+            let source = '?source=' + this.getQueryValue('source');
+            let done = location.origin + location.pathname + source + '&done=true';
+
+            setTimeout(function () {
+                location.replace(done);
+            }, 500);
+
+            throw new Error('Halt processing');
+        }
+
         saveResults(filename, data) {
-            console.log(filename);
-            console.log(data);
             this.ajaxSetup()
             $.ajax({
                 type: "POST",
