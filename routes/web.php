@@ -43,9 +43,11 @@ Route::get('/images', function () {
 });
 
 Route::get('/dev', function () {
-    $dirs = (new \App\Services\DiffService())->getSources();
+    $sources = (new \App\Services\DiffService())->getSources();
+    foreach($sources as $source => $date) {
+        !d($source);
+    }
 
-    !d($dirs);
 });
 
 Route::get('/', function () {

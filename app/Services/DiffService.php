@@ -11,16 +11,21 @@ use Illuminate\Support\Facades\Storage;
 class DiffService
 {
     public const SOURCE_DIRECTORY = 'public/screenshots';
+
     public function getSources(): array
     {
         $directories = Storage::directories(self::SOURCE_DIRECTORY);
 
-         return collect($directories)->map(function ($directory) {
+        $sources = [];
+        collect($directories)->each(function ($directory) use (&$sources) {
             $timestamp = Storage::lastModified($directory);
             $dirName = str_replace(self::SOURCE_DIRECTORY . '/', '', $directory);
             $date = Carbon::createFromTimestamp($timestamp)->format('m/d/Y');
-            return [$dirName => $date];
-        })->toArray();
+
+            $sources[$dirName] = $date;
+        });
+
+        return $sources;
     }
 
     public function getScreenshotDirectories(): array

@@ -2,6 +2,7 @@ $(document).ready(function ($) {
     window.Differ = null;
     class Differ {
         constructor() {
+            this.sourceList = $('#sources');
             this.screenshotList = $('#screenshots');
             this.loading = $('#loading');
             this.selectScreenshot = $('#select_screenshot');
@@ -14,6 +15,7 @@ $(document).ready(function ($) {
             this.diffMessage = $('#diff_msg');
             this.comparing = $('#comparing');
             this.clearButton = $('#clear_button');
+            this.automateButton = $('#automate_button');
             this.fileData = {};
             this.labels = {
                 before_image: 'Before Screenshot',
@@ -24,17 +26,19 @@ $(document).ready(function ($) {
             this.currentItem = this.getQueryValue('item');
             this.autoMode = this.getQueryValue('auto') === 'true';
             this.nextItem = this.getNextItem();
-            this.imageCount = $('option[value]').length;
+            this.imageCount = $('option[value][data-when]').length;
 
             this.addListeners();
 
             if (this.autoMode) {
                 this.runAutoMode();
             }
+
+            this.sourceList.val(this.getQueryValue('source'));
         }
 
         getQueryValue(key) {
-            let queryString = window.location.search;
+            let queryString = location.search;
             let urlParams = new URLSearchParams(queryString);
 
             return urlParams.get(key);
@@ -42,7 +46,7 @@ $(document).ready(function ($) {
 
         runAutoMode() {
             if (! this.currentItem) {
-                window.location = window.location.href + '&item=1';
+                location = location.href + '&item=1';
             }
             if (this.currentItem && this.currentItem.length > 0) {
                 this.selectScreenshot.hide();
@@ -64,7 +68,7 @@ $(document).ready(function ($) {
                 return;
             }
             let self = this;
-            let params = window.location.search.split('&');
+            let params = location.search.split('&');
             let newParams = [];
 
             params.forEach(function (value) {
@@ -72,7 +76,7 @@ $(document).ready(function ($) {
                     let valParts = value.split('=');
                     let current = parseInt(valParts[1])
                     let next = current + 1;
-                    if (value.includes('item=') && next >= $('option[value]').length) {
+                    if (value.includes('item=') && next >= $('option[value][data-when]').length) {
                         self.haltAutoMode();
                         return;
                     } else {
@@ -87,7 +91,7 @@ $(document).ready(function ($) {
 
         loadNext() {
             if (this.autoMode && this.currentItem < this.imageCount) {
-                window.location = window.location.origin + window.location.pathname + this.nextItem;
+                this.redirect(this.nextItem);
             } else {
                 this.selectScreenshot.show();
                 this.titleArea.show();
@@ -123,6 +127,10 @@ $(document).ready(function ($) {
                     console.log(msg);
                 }
             });
+        }
+
+        redirect(queryString) {
+            location = location.origin + location.pathname + queryString;
         }
 
         ajaxSetup() {
@@ -188,6 +196,12 @@ $(document).ready(function ($) {
         addListeners() {
             let self = this;
 
+            this.sourceList.on('change', function () {
+                let source = $(this).val();
+
+                self.redirect('?source=' + source);
+            });
+
             this.screenshotList.on('change', function () {
                 let name = $(this).find("option:selected").data('name');
                 self.compareImages(name)
@@ -205,6 +219,12 @@ $(document).ready(function ($) {
                 self.diffMessage.hide();
                 self.clearButton.hide();
                 self.screenshotList.val('');
+            });
+
+            this.automateButton.on('click', function () {
+                let source = self.sourceList.val();
+
+                self.redirect('?source=' + source + '&auto=true');
             });
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DiffService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -23,6 +24,7 @@ class HomeController extends Controller
         $item = request('item');
 
         return view('home', [
+            'sources' => (new DiffService())->getSources(),
             'dir' => 'screenshots/' . $sourceDir,
             'item' => $item,
         ]);

@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Storage;
 class ScanUrlsCommand extends Command
 {
     /**
-     * The name and signature of the console command.
+     * artisan app:scanurls --test=sites_test.txt --path=Sites --when=before
+     * artisan app:scanurls --test=sites_test.txt --path=Sites --when=after
      *
      * @var string
      */
