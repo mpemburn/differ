@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('comparison_results', function (Blueprint $table) {
             $table->id();
             $table->string('source');
+            $table->integer('test_number')->default(1);
             $table->dateTime('before_date');
             $table->dateTime('after_date');
             $table->string('filename');

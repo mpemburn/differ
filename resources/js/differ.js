@@ -27,11 +27,16 @@ $(document).ready(function ($) {
             this.autoMode = this.getQueryValue('auto') === 'true';
             this.nextItem = this.getNextItem();
             this.imageCount = $('option[value][data-when]').length;
+            this.testNumber = 0;
 
             this.addListeners();
 
             if (this.autoMode) {
                 this.runAutoMode();
+            }
+
+            if (this.getQueryValue('done') === 'true') {
+                this.persistResults();
             }
 
             this.sourceList.val(this.getQueryValue('source'));
@@ -46,9 +51,10 @@ $(document).ready(function ($) {
 
         runAutoMode() {
             if (! this.currentItem) {
-                location = location.href + '&item=1';
+                this.redirect(location.search + '&item=1');
             }
-            if (this.currentItem && this.currentItem.length > 0) {
+
+            if (this.currentItem && this.currentItem.length === 1) {
                 this.selectScreenshot.hide();
                 this.titleArea.hide();
                 this.processItem(this.currentItem);
@@ -75,8 +81,9 @@ $(document).ready(function ($) {
                 if (value.includes('item=')) {
                     let valParts = value.split('=');
                     let current = parseInt(valParts[1])
+                    let lastItem = $('option[value][data-when]').length;
                     let next = current + 1;
-                    if (value.includes('item=') && next >= $('option[value][data-when]').length) {
+                    if (next > lastItem) {
                         self.haltAutoMode();
                         return;
                     } else {
@@ -110,14 +117,57 @@ $(document).ready(function ($) {
         }
 
         saveResults(filename, data) {
+            let self = this;
+
             this.ajaxSetup()
             $.ajax({
                 type: "POST",
                 url: "/save_results",
                 data: $.param({
                     source: this.getQueryValue('source'),
+                    testNumber: this.testNumber,
                     filename: filename,
                     percentage: data.misMatchPercentage
+                }),
+                processData: false,
+                success: function (data) {
+                    self.loadNext();
+
+                    console.log(data);
+                },
+                error: function (msg) {
+                    console.log(msg);
+                }
+            });
+        }
+
+        persistResults() {
+            let self = this;
+
+            this.ajaxSetup()
+            $.ajax({
+                type: "POST",
+                url: "/persist_results",
+                data: $.param({
+                    source: this.getQueryValue('source')
+                }),
+                processData: false,
+                success: function (data) {
+                    console.log(data);
+                    self.getResults();
+                },
+                error: function (msg) {
+                    console.log(msg);
+                }
+            });
+        }
+
+        getResults() {
+            $.ajax({
+                type: "GET",
+                url: "/get_results",
+                data: $.param({
+                    source: this.getQueryValue('source')
                 }),
                 processData: false,
                 success: function (data) {
@@ -127,6 +177,15 @@ $(document).ready(function ($) {
                     console.log(msg);
                 }
             });
+        }
+
+        insertUrlParam(key, value) {
+            if (history.pushState) {
+                let searchParams = new URLSearchParams(location.search);
+                searchParams.set(key, value);
+                let newUrl = location.protocol + "//" + location.host + location.pathname + '?' + searchParams.toString();
+                history.pushState({path: newUrl}, '', newUrl);
+            }
         }
 
         redirect(queryString) {
@@ -265,7 +324,7 @@ $(document).ready(function ($) {
 
             data = null;
             differ.clearData();
-            differ.loadNext();
+            // differ.loadNext();
         }
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Services\BrowserScreenShotService;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
 /*
@@ -43,11 +44,8 @@ Route::get('/images', function () {
 });
 
 Route::get('/dev', function () {
-    $sources = (new \App\Services\DiffService())->getSources();
-    foreach($sources as $source => $date) {
-        !d($source);
-    }
 
+    !d(Session::get('Clark'));
 });
 
 Route::get('/', function () {
@@ -56,7 +54,9 @@ Route::get('/', function () {
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/fetch_images', [DiffController::class, 'fetchImages']);
-Route::post('/save_results', [DiffController::class, 'saveResults']);
+Route::get('/get_results', [DiffController::class, 'getResults']);
+Route::post('/save_results', [DiffController::class, 'saveComparison']);
+Route::post('/persist_results', [DiffController::class, 'persistResults']);
 
 Auth::routes();
 

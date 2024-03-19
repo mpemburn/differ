@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Models\ComparisonResult;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
 class DiffService
@@ -49,13 +51,35 @@ class DiffService
         $beforeDate = $this->getFileDate($source, $filename, 'before');
         $afterDate = $this->getFileDate($source, $filename, 'after');
         $now = Carbon::now()->toDateTimeString();
-        ComparisonResult::create([
+
+        Log::debug($filename);
+        // Push all records into a session var.
+        Session::push($source, [
             'source' => $source,
             'before_date' => $beforeDate ?: $now,
             'after_date' =>  $afterDate ?: $now,
             'filename' => $filename,
             'diff_percentage' => $percentage
         ]);
+    }
+
+    public function persistResults()
+    {
+        $source = request('source');
+        $tests = ComparisonResult::where('source', $source)->max('test_number');
+        $testNumber = $tests ? $tests + 1 : 1;
+
+        $results = Session::get($source);
+
+        if ($results) {
+            collect($results)->each(function ($result) use ($testNumber) {
+                Log::debug('Persisting: ' . $result['filename']);
+                $result['test_number'] = $testNumber;
+                ComparisonResult::create($result);
+            });
+        }
+
+        Session::forget($source);
     }
 
     protected function getFileDate(string $source, string $filename, string $when): ?string

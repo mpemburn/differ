@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ComparisonResult;
 use App\Services\DiffService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -33,10 +34,27 @@ class DiffController extends Controller
         return response()->json(['images' => $data]);
     }
 
-    public function saveResults(Request $request)
+    public function saveComparison(Request $request)
     {
         $this->diffService->saveComparison();
 
         return response()->json(['success' => true]);
     }
+
+    public function persistResults(Request $request)
+    {
+        $this->diffService->persistResults();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function getResults(Request $request)
+    {
+        $source = request('source');
+
+        $results = ComparisonResult::latestTest($source)->get();
+
+        return response()->json(['results' => $results]);
+    }
+
 }
