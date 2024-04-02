@@ -10,12 +10,14 @@ use Illuminate\Support\Facades\Storage;
 class ScanUrlsCommand extends Command
 {
     /**
-     * artisan app:scanurls --test=sites_test.txt --path=Sites --when=before
-     * artisan app:scanurls --test=sites_test.txt --path=Sites --when=after
+     * artisan app:scanurls --test=sites_test.txt --path=Sites-test --when=before
+     * artisan app:scanurls --test=sites_test.txt --path=Sites-test --when=after
      *
      * @var string
      */
-    protected $signature = 'app:scanurls {--test=} {--path=} {--when=} ';
+    protected $signature = 'app:scanurls {--test=} {--path=} {--when=} {--auth=}';
+
+    protected bool $auth = false;
 
     /**
      * The console command description.
@@ -32,6 +34,7 @@ class ScanUrlsCommand extends Command
         $test = $this->option('test');
         $path = $this->option('path');
         $when = $this->option('when');
+        $this->auth = (bool) $this->option('auth');
 
         $testUrls = Storage::path('public/URLs/' . $test);
         $urlArray = Reader::getContentsAsArray($testUrls);
@@ -53,14 +56,30 @@ class ScanUrlsCommand extends Command
         $service = new BrowserScreenShotService($path);
 
         collect($urls)->each(function ($url) use ($service) {
+            if (! str_starts_with($url, 'https')) {
+                return;
+            }
             echo 'Scanning: ' . $url . PHP_EOL;
 
             $parts = parse_url($url);
             $title = str_replace('/', '', $parts['path']);
 
+            $url = $this->setAuth($url);
             $service->login($url)->screenshot($url, $title);
         });
 
         return ! file_exists(Storage::path('retry.txt'));
+    }
+
+    protected function setAuth(string $url): string
+    {
+        if ($this->auth && env('HTTP_AUTH_USERNAME') && env('HTTP_AUTH_PASSWORD')) {
+            return str_replace('https://',
+                'https://' . env('HTTP_AUTH_USERNAME') . ':' . env('HTTP_AUTH_PASSWORD') . '@',
+                $url
+            );
+        }
+
+        return $url;
     }
 }
