@@ -25,8 +25,9 @@ $(document).ready(function ($) {
             this.currentImage = null;
             this.currentItem = this.getQueryValue('item');
             this.autoMode = this.getQueryValue('auto') === 'true';
+            this.finishedAutoMode = false;
             this.nextItem = this.getNextItem();
-            this.imageCount = $('option[value][data-when]').length;
+            this.countSelector = 'option[value][data-when="before"]';
             this.testNumber = 0;
 
             this.addListeners();
@@ -54,7 +55,7 @@ $(document).ready(function ($) {
                 this.redirect(location.search + '&item=1');
             }
 
-            if (this.currentItem && this.currentItem.length === 1) {
+            if (this.currentItem) {
                 this.selectScreenshot.hide();
                 this.titleArea.hide();
                 this.processItem(this.currentItem);
@@ -65,7 +66,7 @@ $(document).ready(function ($) {
             let image = this.screenshotList.find('option[value="' + itemNumber+ '"]');
             let name = image.is('*') ? image.data('name') : null;
             if (name) {
-                this.compareImages(name);
+                this.prepareDataForComparison(name);
             }
         }
 
@@ -81,10 +82,11 @@ $(document).ready(function ($) {
                 if (value.includes('item=')) {
                     let valParts = value.split('=');
                     let current = parseInt(valParts[1])
-                    let lastItem = $('option[value][data-when]').length;
+                    let lastItem = $('option[value][data-when="before"]').length;
                     let next = current + 1;
                     if (next > lastItem) {
-                        self.haltAutoMode();
+                        self.finishedAutoMode = true;
+                        self.processItem(lastItem);
                         return;
                     } else {
                         value = 'item=' + next;
@@ -97,7 +99,9 @@ $(document).ready(function ($) {
         }
 
         loadNext() {
-            if (this.autoMode && this.currentItem < this.imageCount) {
+            let imageCount = $(this.countSelector).length;
+
+            if (this.autoMode && this.currentItem < imageCount) {
                 this.redirect(this.nextItem);
             } else {
                 this.selectScreenshot.show();
@@ -129,7 +133,7 @@ $(document).ready(function ($) {
                     filename: filename,
                     percentage: data.misMatchPercentage
                 }),
-                processData: false,
+                compareWithResembleJs: false,
                 success: function (data) {
                     self.loadNext();
 
@@ -151,7 +155,7 @@ $(document).ready(function ($) {
                 data: $.param({
                     source: this.getQueryValue('source')
                 }),
-                processData: false,
+                compareWithResembleJs: false,
                 success: function (data) {
                     console.log(data);
                     self.getResults();
@@ -169,7 +173,7 @@ $(document).ready(function ($) {
                 data: $.param({
                     source: this.getQueryValue('source')
                 }),
-                processData: false,
+                compareWithResembleJs: false,
                 success: function (data) {
                     console.log(data);
                 },
@@ -209,7 +213,7 @@ $(document).ready(function ($) {
         }
 
         // Retrieve binary file data and process it
-        getFileData(filename, imgSrc, when) {
+        fetchBinaryFileData(filename, imgSrc, when) {
             let self = this;
 
             fetch(imgSrc)
@@ -219,12 +223,12 @@ $(document).ready(function ($) {
 
                     if (self.fileData.before && self.fileData.after) {
                         self.fileData.name = filename;
-                        self.processData();
+                        self.compareWithResembleJs();
                     }
                 });
         }
 
-        compareImages(name) {
+        prepareDataForComparison(name) {
             let image1 = $('[data-name="' + name + '"][data-when="before"]');
             let image2 = $('[data-name="' + name + '"][data-when="after"]');
             let src1 = image1.data('url');
@@ -241,15 +245,15 @@ $(document).ready(function ($) {
             $("#after_image").html('<img src="' + src2 + '" alt="after"/>');
 
             //this.clearData();
-            this.getFileData(name, src1, 'before');
-            this.getFileData(name, src2, 'after');
+            this.fetchBinaryFileData(name, src1, 'before');
+            this.fetchBinaryFileData(name, src2, 'after');
         }
 
-        processData() {
+        compareWithResembleJs() {
             this.currentImage = this.fileData.name;
             resemble(this.fileData.before)
                 .compareTo(this.fileData.after)
-                .onComplete(this.onComplete);
+                .onComplete(this.resembleComplete);
         }
 
         addListeners() {
@@ -263,7 +267,7 @@ $(document).ready(function ($) {
 
             this.screenshotList.on('change', function () {
                 let name = $(this).find("option:selected").data('name');
-                self.compareImages(name)
+                self.prepareDataForComparison(name)
             });
 
             this.clearButton.on('click', function () {
@@ -287,7 +291,7 @@ $(document).ready(function ($) {
             });
         }
 
-        onComplete(data) {
+        resembleComplete(data) {
             let differ = window.Differ;
             let time = Date.now();
             let diffImage = new Image();
@@ -324,7 +328,9 @@ $(document).ready(function ($) {
 
             data = null;
             differ.clearData();
-            // differ.loadNext();
+            if (differ.finishedAutoMode) {
+                differ.haltAutoMode();
+            }
         }
     }
 

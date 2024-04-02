@@ -6,8 +6,13 @@ use Illuminate\Support\Facades\Storage;
 
 class Image
 {
-    public function getScreenshots(string $directory): array
+    public function getScreenshots(string $path, ?string $directory): array
     {
+        if (! $directory) {
+            return [];
+        }
+        $directory = $path . $directory;
+
         $index = 0;
         $files = Storage::disk('public')->allFiles($directory);
         $result = [];

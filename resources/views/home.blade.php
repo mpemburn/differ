@@ -17,10 +17,11 @@
                     <button id="automate_button" class="btn btn-primary btn-sm">Automate</button>
                 </div>
                 <div id="select_screenshot" class="col-3">
+                    @if($screenshots)
                     <h4>Screenshots:</h4>
                     <select id="screenshots">
                         <option value="">Select Screenshot to Test</option>
-                        @foreach(App\Facades\Image::getScreenshots($dir) as $image => $data)
+                        @foreach($screenshots as $image => $data)
                                 <?php $name = App\Facades\Image::getName($image) ?>
                             @if ($data['when'] === 'before')
                                 <option value="{{ $data['index'] }}"
@@ -40,6 +41,7 @@
                     <img id="loading"
                          src="https://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif" alt="" width="24"
                          height="24">
+                    @endif
                 </div>
                 <div class="row">
                     <div id="image_area" class="col-md-4">

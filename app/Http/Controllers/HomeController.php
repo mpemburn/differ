@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Image;
 use App\Services\DiffService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
 
 class HomeController extends Controller
 {
@@ -24,9 +22,10 @@ class HomeController extends Controller
         $sourceDir = request('source');
         $item = request('item');
 
+        $screenshots = Image::getScreenshots('screenshots/',  $sourceDir);
         return view('home', [
             'sources' => (new DiffService())->getSources(),
-            'dir' => 'screenshots/' . $sourceDir,
+            'screenshots' => $screenshots,
             'item' => $item,
         ]);
     }
