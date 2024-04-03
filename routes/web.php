@@ -46,9 +46,9 @@ Route::get('/images', function () {
 
 Route::get('/dev', function () {
 
-    $results = ComparisonResult::latestTest('Www-4-3-24')->get();
+    $results = ComparisonResult::latestTest('News-test-4-2-24')->get();
 
-    !d($results);
+    !d($results->count());
 
 });
 

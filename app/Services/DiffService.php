@@ -3,10 +3,8 @@
 namespace App\Services;
 
 use App\Models\ComparisonResult;
-use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
@@ -62,7 +60,7 @@ class DiffService
         ]);
     }
 
-    public function persistResults()
+    public function persistResults(): void
     {
         $source = request('source');
         $tests = ComparisonResult::where('source', $source)->max('test_number');

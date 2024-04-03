@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Facades\Image;
+use App\Models\ComparisonResult;
 use App\Services\DiffService;
 
 class HomeController extends Controller
@@ -23,9 +24,13 @@ class HomeController extends Controller
         $item = request('item');
 
         $screenshots = Image::getScreenshots('screenshots/',  $sourceDir);
+        $results = ComparisonResult::latestTest($sourceDir)->get();
+
         return view('home', [
             'sources' => (new DiffService())->getSources(),
             'screenshots' => $screenshots,
+            'hasSource' => (bool) $sourceDir,
+            'hasResults' => $results->count() > 0,
             'item' => $item,
         ]);
     }

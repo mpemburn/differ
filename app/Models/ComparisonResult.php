@@ -17,13 +17,10 @@ class ComparisonResult extends Model
         'diff_percentage'
     ];
 
-    public function scopeLatestTest($query, string $source)
+    public function scopeLatestTest($query, ?string $source)
     {
-        // Select records with the highest batch number
-        return $query->where('source', $source)
-            ->where('test_number', function ($subquery) {
-            $subquery->selectRaw('MAX(test_number)')
-                ->from('comparison_results');
-        });
+        $max = ComparisonResult::where('source', $source)->max('test_number');
+
+        return ComparisonResult::where('source', $source)->where('test_number', $max);
     }
 }

@@ -44,8 +44,12 @@
             </div>
             <div id="button_area" class="row">
                 <div class="col-12">
-                    <button id="automate_button" class="btn btn-primary btn-sm">Automate</button>
-                    <button id="results_button" class="btn btn-primary btn-sm">Show Results</button>
+                    @if($hasSource)
+                        <button id="automate_button" class="btn btn-primary btn-sm">Automate</button>
+                    @endif
+                    @if($hasResults)
+                        <button id="results_button" class="btn btn-primary btn-sm">Show Results</button>
+                    @endif
                 </div>
             </div>
             <div class="row">

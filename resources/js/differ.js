@@ -40,10 +40,6 @@ $(document).ready(function ($) {
                 this.runAutoMode();
             }
 
-            if (this.getQueryValue('done') === 'true') {
-                this.persistResults();
-            }
-
             this.sourceList.val(this.getQueryValue('source'));
         }
 
@@ -66,11 +62,14 @@ $(document).ready(function ($) {
             }
         }
 
-        processItem(itemNumber) {
+        processItem(itemNumber, isLast = false) {
             let image = this.screenshotList.find('option[value="' + itemNumber+ '"]');
             let name = image.is('*') ? image.data('name') : null;
             if (name) {
                 this.prepareDataForComparison(name);
+            }
+            if (isLast) {
+                this.persistResults();
             }
         }
 
@@ -90,7 +89,7 @@ $(document).ready(function ($) {
                     let next = current + 1;
                     if (next > lastItem) {
                         self.finishedAutoMode = true;
-                        self.processItem(lastItem);
+                        self.processItem(lastItem, true);
                         return;
                     } else {
                         value = 'item=' + next;
