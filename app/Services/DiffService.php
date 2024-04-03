@@ -52,7 +52,6 @@ class DiffService
         $afterDate = $this->getFileDate($source, $filename, 'after');
         $now = Carbon::now()->toDateTimeString();
 
-        Log::debug($filename);
         // Push all records into a session var.
         Session::push($source, [
             'source' => $source,
@@ -73,7 +72,6 @@ class DiffService
 
         if ($results) {
             collect($results)->each(function ($result) use ($testNumber) {
-                Log::debug('Persisting: ' . $result['filename']);
                 $result['test_number'] = $testNumber;
                 ComparisonResult::create($result);
             });

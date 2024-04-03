@@ -4,6 +4,7 @@ use App\Facades\Image;
 use App\Facades\Reader;
 use App\Http\Controllers\DiffController;
 use App\Http\Controllers\HomeController;
+use App\Models\ComparisonResult;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -45,7 +46,10 @@ Route::get('/images', function () {
 
 Route::get('/dev', function () {
 
-    !d(Session::get('Clark'));
+    $results = ComparisonResult::latestTest('Www-4-3-24')->get();
+
+    !d($results);
+
 });
 
 Route::get('/', function () {

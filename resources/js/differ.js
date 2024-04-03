@@ -16,6 +16,10 @@ $(document).ready(function ($) {
             this.comparing = $('#comparing');
             this.clearButton = $('#clear_button');
             this.automateButton = $('#automate_button');
+            this.resultsButton = $('#results_button');
+            this.resultsList = $('#results_list tbody');
+            this.resultsModal = $('#results_modal');
+            this.resultsItems = $('td[data-name]');
             this.fileData = {};
             this.labels = {
                 before_image: 'Before Screenshot',
@@ -120,6 +124,14 @@ $(document).ready(function ($) {
             throw new Error('Halt processing');
         }
 
+        ajaxSetup() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        }
+
         saveResults(filename, data) {
             let self = this;
 
@@ -133,7 +145,7 @@ $(document).ready(function ($) {
                     filename: filename,
                     percentage: data.misMatchPercentage
                 }),
-                compareWithResembleJs: false,
+                processData: false,
                 success: function (data) {
                     self.loadNext();
 
@@ -167,15 +179,31 @@ $(document).ready(function ($) {
         }
 
         getResults() {
+            let self = this;
+            let source = this.getQueryValue('source')
             $.ajax({
                 type: "GET",
                 url: "/get_results",
                 data: $.param({
-                    source: this.getQueryValue('source')
+                    source: source
                 }),
-                compareWithResembleJs: false,
+                processData: false,
                 success: function (data) {
-                    console.log(data);
+                    self.resultsList.empty();
+                    $('#results_source').html(source);
+                    data.results.forEach(function (value) {
+                        self.resultsList.append('<tr>')
+                        self.resultsList.append('<td data-name="' + value.filename + '">' + value.filename + '</td>')
+                        self.resultsList.append('<td>' + value.diff_percentage + '%</td>')
+                        self.resultsList.append('</tr>')
+                    });
+                    $('td[data-name]').on('click', function () {
+                        let name = $(this).data('name');
+                        self.resultsModal.modal('hide');
+                        self.prepareDataForComparison(name)
+                    });
+
+                    self.resultsModal.modal('show');
                 },
                 error: function (msg) {
                     console.log(msg);
@@ -194,14 +222,6 @@ $(document).ready(function ($) {
 
         redirect(queryString) {
             location = location.origin + location.pathname + queryString;
-        }
-
-        ajaxSetup() {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
         }
 
         clearData() {
@@ -256,41 +276,6 @@ $(document).ready(function ($) {
                 .onComplete(this.resembleComplete);
         }
 
-        addListeners() {
-            let self = this;
-
-            this.sourceList.on('change', function () {
-                let source = $(this).val();
-
-                self.redirect('?source=' + source);
-            });
-
-            this.screenshotList.on('change', function () {
-                let name = $(this).find("option:selected").data('name');
-                self.prepareDataForComparison(name)
-            });
-
-            this.clearButton.on('click', function () {
-                self.zones.each(function () {
-                    let zone = $(this);
-                    let id = zone.attr('id');
-
-                    zone.empty()
-                    zone.html(self.labels[id]);
-                });
-                self.comparing.empty();
-                self.diffMessage.hide();
-                self.clearButton.hide();
-                self.screenshotList.val('');
-            });
-
-            this.automateButton.on('click', function () {
-                let source = self.sourceList.val();
-
-                self.redirect('?source=' + source + '&auto=true');
-            });
-        }
-
         resembleComplete(data) {
             let differ = window.Differ;
             let time = Date.now();
@@ -331,6 +316,45 @@ $(document).ready(function ($) {
             if (differ.finishedAutoMode) {
                 differ.haltAutoMode();
             }
+        }
+
+        addListeners() {
+            let self = this;
+
+            this.sourceList.on('change', function () {
+                let source = $(this).val();
+
+                self.redirect('?source=' + source);
+            });
+
+            this.screenshotList.on('change', function () {
+                let name = $(this).find("option:selected").data('name');
+                self.prepareDataForComparison(name)
+            });
+
+            this.clearButton.on('click', function () {
+                self.zones.each(function () {
+                    let zone = $(this);
+                    let id = zone.attr('id');
+
+                    zone.empty()
+                    zone.html(self.labels[id]);
+                });
+                self.comparing.empty();
+                self.diffMessage.hide();
+                self.clearButton.hide();
+                self.screenshotList.val('');
+            });
+
+            this.automateButton.on('click', function () {
+                let source = self.sourceList.val();
+
+                self.redirect('?source=' + source + '&auto=true');
+            });
+
+            this.resultsButton.on('click', function () {
+                self.getResults();
+            });
         }
     }
 

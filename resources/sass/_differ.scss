@@ -1,5 +1,11 @@
+#selects_area,
+#button_area {
+    margin-left: 1rem;
+}
+
 #sources,
 #screenshots {
+    max-width: 20rem;
     margin-bottom: 0.5rem;
 
     & > select {
@@ -77,6 +83,11 @@ option.hidden {
     white-space: nowrap;
 }
 
+#button_area {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
 #comparing {
     white-space: nowrap;
 }
@@ -85,4 +96,14 @@ option.hidden {
     display: none;
     border: 1px solid #111111;
     padding: 2px 4px;
+}
+
+td[data-name] {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #0000cc;
+
+    &:hover {
+        color: #0000ff;
+    }
 }
