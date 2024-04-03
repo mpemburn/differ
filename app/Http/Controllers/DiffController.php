@@ -52,7 +52,7 @@ class DiffController extends Controller
     {
         $source = request('source');
 
-        $results = ComparisonResult::latestTest($source)->get();
+        $results = ComparisonResult::latestTest($source)->orderBy('filename')->get();
 
         return response()->json(['results' => $results]);
     }

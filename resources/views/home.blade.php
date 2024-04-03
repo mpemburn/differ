@@ -72,6 +72,7 @@
                     <div id="diff_msg">
                         Click on the image above to open in a new tab.
                         <div id="percentage"></div>
+                        <div id="height_diff"></div>
                     </div>
                 </div>
             </div>

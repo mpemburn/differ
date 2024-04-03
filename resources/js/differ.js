@@ -279,6 +279,10 @@ $(document).ready(function ($) {
             let differ = window.Differ;
             let time = Date.now();
             let diffImage = new Image();
+            let heightDiff = Math.abs(data.dimensionDifference.height).toLocaleString();
+            let heightMessage = (heightDiff !== 0)
+                ? 'The two images differ in height by ' + heightDiff + ' pixels' : '';
+
             diffImage.src = data.getImageDataUrl();
             //console.log(data);
 
@@ -288,6 +292,7 @@ $(document).ready(function ($) {
 
             $("#diff_image").html(diffImage);
             $("#percentage").html('The "after" image differs from the "before" image by ' + data.misMatchPercentage + '%');
+            $("#height_diff").html(heightMessage);
 
             $(diffImage).addClass('difference').click(function() {
                 var w = window.open("about:blank", "_blank");
