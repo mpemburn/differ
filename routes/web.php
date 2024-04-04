@@ -4,6 +4,7 @@ use App\Facades\Image;
 use App\Facades\Reader;
 use App\Http\Controllers\DiffController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ScannerController;
 use App\Models\ComparisonResult;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -45,10 +46,7 @@ Route::get('/images', function () {
 });
 
 Route::get('/dev', function () {
-
-    $results = ComparisonResult::latestTest('News-test-4-2-24')->get();
-
-    !d($results->count());
+    (new \App\Services\ScannerService())->getUrlFileList();
 
 });
 
@@ -61,6 +59,8 @@ Route::get('/fetch_images', [DiffController::class, 'fetchImages']);
 Route::get('/get_results', [DiffController::class, 'getResults']);
 Route::post('/save_results', [DiffController::class, 'saveComparison']);
 Route::post('/persist_results', [DiffController::class, 'persistResults']);
+
+Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner');
 
 Auth::routes();
 

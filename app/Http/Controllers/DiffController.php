@@ -56,5 +56,4 @@ class DiffController extends Controller
 
         return response()->json(['results' => $results]);
     }
-
 }
