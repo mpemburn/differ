@@ -46,7 +46,6 @@ Route::get('/images', function () {
 });
 
 Route::get('/dev', function () {
-    (new \App\Services\ScannerService())->getUrlFileList();
 
 });
 

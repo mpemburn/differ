@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Services\ScannerService;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Illuminate\Support\Facades\Session;
 
@@ -25,7 +26,10 @@ class Scanner extends Component
 
     public function scan(): void
     {
-        Session::forget('results');
+        if (Session::has('results')) {
+            Session::forget('results');
+        }
+        $this->results = '';
         $this->service->setFilename($this->file)
             ->setTestName($this->name)
             ->setWhen($this->when)
@@ -35,7 +39,7 @@ class Scanner extends Component
 
     public function refreshResults(): void
     {
-        $this->results = '';
+        $this->results = 'Scanning...<br>';
         if (Session::has('results')) {
             foreach (Session::get('results') as $result) {
                 $this->results .=  $result . '<br>';

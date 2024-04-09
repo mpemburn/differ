@@ -22,7 +22,13 @@ class DiffService
             $dirName = str_replace(self::SOURCE_DIRECTORY . '/', '', $directory);
             $date = Carbon::createFromTimestamp($timestamp)->format('m/d/Y');
 
-            $sources[$dirName] = $date;
+            // Only display if both before and after directories exist
+            if (
+                file_exists(Storage::path($directory . '/before'))
+                && file_exists(Storage::path($directory . '/after'))
+            ) {
+                $sources[$dirName] = $date;
+            }
         });
 
         return $sources;
