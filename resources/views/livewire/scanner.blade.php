@@ -11,11 +11,13 @@
     <button class="btn btn-primary btn-sm float-right" wire:click="generate">Generate Command</button>
 
     <div>
+        @if($command)
         <h5>
             <span class="btn_copy" wire:click="copy">⎘</span>
             Command: <span id="command">{{ $command }}</span>
         </h5>
         <span id="copied"></span>
+        @endif
     </div>
 </div>
 <script>
@@ -25,6 +27,9 @@
             let message = $('#copied');
             navigator.clipboard.writeText(contents).then(() => {
                 message.html('Copied to clipboard');
+                setTimeout(function () {
+                    message.fadeOut(1000);
+                }, 2000);
             }, () => {
                 message.html('Failed to copy');
             });

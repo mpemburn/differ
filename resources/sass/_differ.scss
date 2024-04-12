@@ -13,6 +13,11 @@
     }
 }
 
+select,
+input[type=text], {
+    height: 2rem;
+}
+
 option.hidden {
     display: none;
 }

@@ -23,11 +23,20 @@ class Scanner extends Component
 
     public function setFile(): void
     {
-        $this->name = $this->makeName($this->file);
+        $name = $this->file !== '' ? $this->makeName($this->file) : '';
+        $this->name = $name;
+        $this->command = '';
+        $this->when = '';
     }
 
     public function generate(): void
     {
+        if ($this->file === ''|| $this->name === ''|| $this->when === '') {
+            $this->command = '';
+
+            return;
+        }
+
         $this->command = "php artisan app:scanurls --test={$this->file} --name={$this->name} --when={$this->when}";
     }
 
