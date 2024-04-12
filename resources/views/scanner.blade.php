@@ -6,17 +6,9 @@
             <div class="container">
                 <div id="controls" class="col-md-10">
                     <div class="card">
-                        <div class="card-header">{{ __('Create Screenshot Collections') }}</div>
+                        <div class="card-header">{{ __('Generate Screenshot Command') }}</div>
                         <div class="card-body no-margin">
                             <livewire:scanner/>
-                        </div>
-                    </div>
-                </div>
-                <div id="progress" class="col-md-10">
-                    <div class="card">
-                        <div class="card-header">{{ __('Progress') }}</div>
-                        <div class="card-body no-margin">
-
                         </div>
                     </div>
                 </div>

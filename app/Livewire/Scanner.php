@@ -3,48 +3,45 @@
 namespace App\Livewire;
 
 use App\Services\ScannerService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Illuminate\Support\Facades\Session;
 
 class Scanner extends Component
 {
-    public bool $auth = false;
-    public string $filename;
-    public string $name = 'Livewire';
-    public string $when = 'before';
-
-    public string $file = 'news_test.txt';
-    public string $results;
+    public string $file = '';
+    public string $name = '';
+    public string $when = '';
+    public string $command = '';
     private ScannerService $service;
 
     public function __construct()
     {
-
         $this->service = (new ScannerService());
     }
 
-    public function scan(): void
+    public function setFile(): void
     {
-        if (Session::has('results')) {
-            Session::forget('results');
-        }
-        $this->results = '';
-        $this->service->setFilename($this->file)
-            ->setTestName($this->name)
-            ->setWhen($this->when)
-            ->requiresAuth($this->auth)
-            ->scan();
+        $this->name = $this->makeName($this->file);
     }
 
-    public function refreshResults(): void
+    public function generate(): void
     {
-        $this->results = 'Scanning...<br>';
-        if (Session::has('results')) {
-            foreach (Session::get('results') as $result) {
-                $this->results .=  $result . '<br>';
-            }
-        }
+        $this->command = "php artisan app:scanurls --test={$this->file} --name={$this->name} --when={$this->when}";
+    }
+
+    public function copy()
+    {
+        $this->dispatch('copyToClipboard');
+    }
+
+    protected function makeName(string $filename): string
+    {
+        $date = Carbon::now()->format('-m-d-y');
+        $name = basename($filename, '.txt');
+
+        return ucfirst($name) . $date;
     }
 
     public function render()
