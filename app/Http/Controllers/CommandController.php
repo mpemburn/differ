@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ScannerService;
+use App\Services\CommandService;
 use Illuminate\Http\Request;
 
-class ScannerController extends Controller
+class CommandController extends Controller
 {
-    public function index(ScannerService $service)
+    public function index(CommandService $service)
     {
         return view('scanner', [
             'files' => $service->getUrlFileList()

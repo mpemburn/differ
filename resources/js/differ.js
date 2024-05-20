@@ -88,8 +88,8 @@ $(document).ready(function ($) {
                     let lastItem = $('option[value][data-when="before"]').length;
                     let next = current + 1;
                     if (next > lastItem) {
-                        self.finishedAutoMode = true;
                         self.processItem(lastItem, true);
+                        self.finishedAutoMode = true;
                         return;
                     } else {
                         value = 'item=' + next;

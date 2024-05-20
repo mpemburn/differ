@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Facades\Reader;
 use App\Services\BrowserScreenShotService;
-use App\Services\ScannerService;
+use App\Services\CommandService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -35,7 +35,7 @@ class ScanUrlsCommand extends Command
         $when = $this->option('when');
         $auth = (bool) $this->option('auth');
 
-        (new ScannerService())->setFilename($test)
+        (new CommandService())->setFilename($test)
             ->setTestName($name)
             ->setWhen($when)
             ->setVerbose(true)

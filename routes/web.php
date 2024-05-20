@@ -4,7 +4,7 @@ use App\Facades\Image;
 use App\Facades\Reader;
 use App\Http\Controllers\DiffController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ScannerController;
+use App\Http\Controllers\CommandController;
 use App\Models\ComparisonResult;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -63,7 +63,7 @@ Route::get('/get_results', [DiffController::class, 'getResults']);
 Route::post('/save_results', [DiffController::class, 'saveComparison']);
 Route::post('/persist_results', [DiffController::class, 'persistResults']);
 
-Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner');
+Route::get('/command', [CommandController::class, 'index'])->name('command');
 
 Auth::routes();
 

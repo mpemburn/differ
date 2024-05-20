@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Services\ScannerService;
+use App\Services\CommandService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -14,11 +14,11 @@ class Scanner extends Component
     public string $name = '';
     public string $when = '';
     public string $command = '';
-    private ScannerService $service;
+    private CommandService $service;
 
     public function __construct()
     {
-        $this->service = (new ScannerService());
+        $this->service = (new CommandService());
     }
 
     public function setFile(): void

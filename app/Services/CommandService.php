@@ -6,7 +6,7 @@ use App\Facades\Reader;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Session;
 
-class ScannerService
+class CommandService
 {
     protected bool $auth = false;
     protected bool $verbose = false;
