@@ -17,6 +17,7 @@ $(document).ready(function ($) {
             this.resultsButton = $('#results_button');
             this.resultsList = $('#results_list tbody');
             this.resultsModal = $('#results_modal');
+            this.hasResults = $('#has_results').html();
             this.fileData = {};
             this.labels = {
                 before_image: 'Before Screenshot',
@@ -31,6 +32,10 @@ $(document).ready(function ($) {
             this.addListeners();
 
             this.sourceList.val(this.getQueryValue('source'));
+
+            if (this.hasResults) {
+                this.resultsButton.show();
+            }
         }
 
         getQueryValue(key) {
@@ -49,16 +54,19 @@ $(document).ready(function ($) {
             this.autoMode = false;
             // Rebuild collection after autoMode has wiped it out.
             this.createImageCollection();
+            this.getResults();
+            this.resultsButton.show();
         }
 
         iterateCollection() {
-            let key = Object.keys(this.imageCollection)[0];
-            let value = Object.values(this.imageCollection)[0];
+            let imageName = Object.keys(this.imageCollection)[0];
+            let imageData = Object.values(this.imageCollection)[0];
 
-            window.currentImage = key;
-            this.prepareDataForComparison(value);
+            window.currentImage = imageName;
+            this.prepareDataForComparison(imageData);
 
-            delete this.imageCollection[key];
+            // Remove this item from the collection
+            delete this.imageCollection[imageName];
 
             if (Object.keys(this.imageCollection).length === 0) {
                 this.haltAutoMode();
@@ -215,8 +223,10 @@ $(document).ready(function ($) {
             diffImage.src = data.getImageDataUrl();
             // console.log(window.currentImage);
 
-            // console.log(window.Differ.currentImage);
-            differ.saveResults(window.currentImage, data);
+            if (differ.autoMode) {
+                differ.saveResults(window.currentImage, data);
+            }
+
             differ.loading.hide();
 
             $("#diff_image").html(diffImage);

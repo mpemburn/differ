@@ -14,6 +14,10 @@
     }
 }
 
+#screenshot_dropdown {
+    position: relative;
+}
+
 select,
 input[type=text], {
     height: 2rem;
@@ -23,12 +27,23 @@ option.hidden {
     display: none;
 }
 
+#select_screenshot {
+    min-width: 30vw;
+}
+
 #loading {
     display: none;
 }
 
 #automate {
     padding-top: 1.9rem;
+}
+
+#has_results {
+    display: none;
+}
+#results_button {
+    display: none;
 }
 
 .mouse-over {

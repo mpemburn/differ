@@ -47,8 +47,7 @@
                 <div class="col-12">
                     @if($hasSource)
                         <button id="automate_button" class="btn btn-primary btn-sm">Automate</button>
-                    @endif
-                    @if($hasResults)
+                        <span id="has_results">{{ $hasResults }}</span>
                         <button id="results_button" class="btn btn-primary btn-sm">Show Results</button>
                     @endif
                 </div>
