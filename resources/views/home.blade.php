@@ -6,6 +6,7 @@
             <div id="selects_area" class="row">
                 <div id="select_source" class="col-3">
                     <h4>Sources:</h4>
+                    <div id="test_number">{{ $testNumber }}</div>
                     <select id="sources">
                         <option value="">Select Source</option>
                         @foreach($sources as $source => $date)

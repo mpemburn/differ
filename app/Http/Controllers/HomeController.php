@@ -25,12 +25,16 @@ class HomeController extends Controller
 
         $screenshots = Image::getScreenshots('screenshots/',  $sourceDir);
         $results = ComparisonResult::latestTest($sourceDir)->get();
+        $lastTest = ComparisonResult::where('source', $sourceDir)->max('test_number');
+
+        $testNumber = $lastTest ? $lastTest + 1 : 1;
 
         return view('home', [
             'sources' => (new DiffService())->getSources(),
             'screenshots' => $screenshots,
             'hasSource' => (bool) $sourceDir,
             'hasResults' => $results->count() > 0,
+            'testNumber' => $testNumber,
             'item' => $item,
         ]);
     }

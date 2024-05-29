@@ -46,6 +46,7 @@ Route::get('/images', function () {
 });
 
 Route::get('/dev', function () {
+
     // Do what thou wilt
 });
 
@@ -58,10 +59,8 @@ Route::get('/differ', function () {
 });
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
-Route::get('/fetch_images', [DiffController::class, 'fetchImages']);
 Route::get('/get_results', [DiffController::class, 'getResults']);
 Route::post('/save_results', [DiffController::class, 'saveComparison']);
-Route::post('/persist_results', [DiffController::class, 'persistResults']);
 
 Route::get('/command', [CommandController::class, 'index'])->name('command');
 

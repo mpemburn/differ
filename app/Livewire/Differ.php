@@ -17,6 +17,7 @@ class Differ extends Component
 
         $screenshots = Image::getScreenshots('screenshots/',  $sourceDir);
         $results = ComparisonResult::latestTest($sourceDir)->get();
+
         return view('livewire.differ',  [
             'sources' => (new DiffService())->getSources(),
             'screenshots' => $screenshots,

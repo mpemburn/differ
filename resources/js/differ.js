@@ -1,14 +1,12 @@
 $(document).ready(function ($) {
     window.Differ = null;
+    window.currentImage = null;
+
     class Differ {
         constructor() {
             this.sourceList = $('#sources');
             this.screenshotList = $('#screenshots');
             this.loading = $('#loading');
-            this.selectScreenshot = $('#select_screenshot');
-            this.titleArea = $('#title_area');
-            this.imageArea = $('#image_area');
-            this.diffArea = $('#diff_area');
             this.images = $('.test-image');
             this.zones = $('.image-zone');
             this.diffImage = $('#diff_image');
@@ -19,26 +17,18 @@ $(document).ready(function ($) {
             this.resultsButton = $('#results_button');
             this.resultsList = $('#results_list tbody');
             this.resultsModal = $('#results_modal');
-            this.resultsItems = $('td[data-name]');
             this.fileData = {};
             this.labels = {
                 before_image: 'Before Screenshot',
                 after_image: 'After Screenshot',
                 diff_image: 'Difference'
             };
-            this.currentImage = null;
-            this.currentItem = this.getQueryValue('item');
-            this.autoMode = this.getQueryValue('auto') === 'true';
-            this.finishedAutoMode = false;
-            this.nextItem = this.getNextItem();
-            this.countSelector = 'option[value][data-when="before"]';
-            this.testNumber = 0;
+            this.autoMode = false;
+            this.testNumber = $('#test_number').html();
+            this.imageCollection = {}
 
+            this.createImageCollection();
             this.addListeners();
-
-            if (this.autoMode) {
-                this.runAutoMode();
-            }
 
             this.sourceList.val(this.getQueryValue('source'));
         }
@@ -51,76 +41,28 @@ $(document).ready(function ($) {
         }
 
         runAutoMode() {
-            if (! this.currentItem) {
-                this.redirect(location.search + '&item=1');
-            }
-
-            if (this.currentItem) {
-                this.selectScreenshot.hide();
-                this.titleArea.hide();
-                this.processItem(this.currentItem);
-            }
-        }
-
-        processItem(itemNumber, isLast = false) {
-            let image = this.screenshotList.find('option[value="' + itemNumber+ '"]');
-            let name = image.is('*') ? image.data('name') : null;
-            if (name) {
-                this.prepareDataForComparison(name);
-            }
-            if (isLast) {
-                this.persistResults();
-            }
-        }
-
-        getNextItem() {
-            if (! this.autoMode) {
-                return;
-            }
             let self = this;
-            let params = location.search.split('&');
-            let newParams = [];
-
-            params.forEach(function (value) {
-                if (value.includes('item=')) {
-                    let valParts = value.split('=');
-                    let current = parseInt(valParts[1])
-                    let lastItem = $('option[value][data-when="before"]').length;
-                    let next = current + 1;
-                    if (next > lastItem) {
-                        self.processItem(lastItem, true);
-                        self.finishedAutoMode = true;
-                        return;
-                    } else {
-                        value = 'item=' + next;
-                    }
-                }
-                newParams.push(value);
-            });
-
-            return newParams.join('&');
-        }
-
-        loadNext() {
-            let imageCount = $(this.countSelector).length;
-
-            if (this.autoMode && this.currentItem < imageCount) {
-                this.redirect(this.nextItem);
-            } else {
-                this.selectScreenshot.show();
-                this.titleArea.show();
-            }
+            this.iterateCollection();
         }
 
         haltAutoMode() {
-            let source = '?source=' + this.getQueryValue('source');
-            let done = location.origin + location.pathname + source + '&done=true';
+            this.autoMode = false;
+            // Rebuild collection after autoMode has wiped it out.
+            this.createImageCollection();
+        }
 
-            setTimeout(function () {
-                location.replace(done);
-            }, 500);
+        iterateCollection() {
+            let key = Object.keys(this.imageCollection)[0];
+            let value = Object.values(this.imageCollection)[0];
 
-            throw new Error('Halt processing');
+            window.currentImage = key;
+            this.prepareDataForComparison(value);
+
+            delete this.imageCollection[key];
+
+            if (Object.keys(this.imageCollection).length === 0) {
+                this.haltAutoMode();
+            }
         }
 
         ajaxSetup() {
@@ -146,30 +88,7 @@ $(document).ready(function ($) {
                 }),
                 processData: false,
                 success: function (data) {
-                    self.loadNext();
-
                     console.log(data);
-                },
-                error: function (msg) {
-                    console.log(msg);
-                }
-            });
-        }
-
-        persistResults() {
-            let self = this;
-
-            this.ajaxSetup()
-            $.ajax({
-                type: "POST",
-                url: "/persist_results",
-                data: $.param({
-                    source: this.getQueryValue('source')
-                }),
-                compareWithResembleJs: false,
-                success: function (data) {
-                    console.log(data);
-                    self.getResults();
                 },
                 error: function (msg) {
                     console.log(msg);
@@ -198,8 +117,10 @@ $(document).ready(function ($) {
                     });
                     $('td[data-name]').on('click', function () {
                         let name = $(this).data('name');
+                        let imageData = self.imageCollection[name];
+
                         self.resultsModal.modal('hide');
-                        self.prepareDataForComparison(name)
+                        self.prepareDataForComparison(imageData);
                     });
 
                     self.resultsModal.modal('show');
@@ -208,15 +129,6 @@ $(document).ready(function ($) {
                     console.log(msg);
                 }
             });
-        }
-
-        insertUrlParam(key, value) {
-            if (history.pushState) {
-                let searchParams = new URLSearchParams(location.search);
-                searchParams.set(key, value);
-                let newUrl = location.protocol + "//" + location.host + location.pathname + '?' + searchParams.toString();
-                history.pushState({path: newUrl}, '', newUrl);
-            }
         }
 
         redirect(queryString) {
@@ -247,25 +159,42 @@ $(document).ready(function ($) {
                 });
         }
 
-        prepareDataForComparison(name) {
-            let image1 = $('[data-name="' + name + '"][data-when="before"]');
-            let image2 = $('[data-name="' + name + '"][data-when="after"]');
-            let src1 = image1.data('url');
-            let src2 = image2.data('url');
+        createImageCollection() {
+            let collection = {};
+            this.screenshotList.children().each(function () {
+                let dataset = $(this)[0].dataset;
+                let parts = {};
 
-            this.currentImage = name;
+                if (dataset.when === 'after') {
+                    parts['after']  = dataset;
+                    collection[dataset.name] = parts;
+                }
+                if (dataset.when === 'before') {
+                    parts = collection[dataset.name];
+                    parts['before']  = dataset;
+                    collection[dataset.name] = parts;
+                }
+            });
+
+            this.imageCollection = collection;
+        }
+
+        prepareDataForComparison(imageData) {
+            let beforeImage = imageData['before']['url'];
+            let afterImage = imageData['after']['url'];
+            let name = imageData['before']['name'];
+
             this.diffImage.html('');
             this.comparing.html('Comparing: ' + name);
             this.clearButton.show();
             this.diffMessage.show();
             this.loading.show();
 
-            $("#before_image").html('<img src="' + src1 + '" alt="before"/>');
-            $("#after_image").html('<img src="' + src2 + '" alt="after"/>');
+            $("#before_image").html('<img src="' + beforeImage + '" alt="before"/>');
+            $("#after_image").html('<img src="' + afterImage + '" alt="after"/>');
 
-            //this.clearData();
-            this.fetchBinaryFileData(name, src1, 'before');
-            this.fetchBinaryFileData(name, src2, 'after');
+            this.fetchBinaryFileData(name, beforeImage, 'before');
+            this.fetchBinaryFileData(name, afterImage, 'after');
         }
 
         compareWithResembleJs() {
@@ -284,10 +213,10 @@ $(document).ready(function ($) {
                 ? 'The two images differ in height by ' + heightDiff + ' pixels' : '';
 
             diffImage.src = data.getImageDataUrl();
-            //console.log(data);
+            // console.log(window.currentImage);
 
             // console.log(window.Differ.currentImage);
-            differ.saveResults(differ.currentImage, data);
+            differ.saveResults(window.currentImage, data);
             differ.loading.hide();
 
             $("#diff_image").html(diffImage);
@@ -316,9 +245,11 @@ $(document).ready(function ($) {
             });
 
             data = null;
-            differ.clearData();
-            if (differ.finishedAutoMode) {
-                differ.haltAutoMode();
+            if (differ.autoMode) {
+                setTimeout(function () {
+                    differ.clearData();
+                    differ.iterateCollection();
+                }, 500);
             }
         }
 
@@ -332,8 +263,10 @@ $(document).ready(function ($) {
             });
 
             this.screenshotList.on('change', function () {
-                let name = $(this).find("option:selected").data('name');
-                self.prepareDataForComparison(name)
+                let imageName = $(this).find("option:selected").data('name');
+                let imageData = self.imageCollection[imageName];
+
+                self.prepareDataForComparison(imageData)
             });
 
             this.clearButton.on('click', function () {
@@ -351,9 +284,8 @@ $(document).ready(function ($) {
             });
 
             this.automateButton.on('click', function () {
-                let source = self.sourceList.val();
-
-                self.redirect('?source=' + source + '&auto=true');
+                self.autoMode = true;
+                self.runAutoMode();
             });
 
             this.resultsButton.on('click', function () {

@@ -9,7 +9,7 @@
                 @endforeach
             </select>
         </div>
-        <div id="select_screenshot" class="col-3">
+        <div id="select_screenshot" class="col-4">
             @if($screenshots)
                 <h4>Screenshots:</h4>
                 <select id="screenshots">
