@@ -1,3 +1,6 @@
+strong {
+    font-weight: bolder !important;
+}
 
 #selects_area,
 #button_area {
@@ -39,10 +42,9 @@ option.hidden {
     padding-top: 1.9rem;
 }
 
-#has_results {
-    display: none;
-}
-#results_button {
+#has_results,
+#results_button,
+#source_links {
     display: none;
 }
 

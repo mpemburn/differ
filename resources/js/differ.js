@@ -12,6 +12,7 @@ $(document).ready(function ($) {
             this.diffImage = $('#diff_image');
             this.diffMessage = $('#diff_msg');
             this.comparing = $('#comparing');
+            this.sourceLinks = $('#source_links');
             this.clearButton = $('#clear_button');
             this.automateButton = $('#automate_button');
             this.resultsButton = $('#results_button');
@@ -31,18 +32,12 @@ $(document).ready(function ($) {
             this.createImageCollection();
             this.addListeners();
 
-            this.sourceList.val(this.getQueryValue('source'));
+            this.currentTestName = this.getQueryValue('source');
+            this.sourceList.val(this.currentTestName);
 
             if (this.hasResults) {
                 this.resultsButton.show();
             }
-        }
-
-        getQueryValue(key) {
-            let queryString = location.search;
-            let urlParams = new URLSearchParams(queryString);
-
-            return urlParams.get(key);
         }
 
         runAutoMode() {
@@ -54,7 +49,7 @@ $(document).ready(function ($) {
             this.autoMode = false;
             // Rebuild collection after autoMode has wiped it out.
             this.createImageCollection();
-            this.getResults();
+            this.showResultsDialog();
             this.resultsButton.show();
         }
 
@@ -71,14 +66,6 @@ $(document).ready(function ($) {
             if (Object.keys(this.imageCollection).length === 0) {
                 this.haltAutoMode();
             }
-        }
-
-        ajaxSetup() {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
         }
 
         saveResults(filename, data) {
@@ -104,7 +91,7 @@ $(document).ready(function ($) {
             });
         }
 
-        getResults() {
+        showResultsDialog() {
             let self = this;
             let source = this.getQueryValue('source')
             $.ajax({
@@ -139,6 +126,50 @@ $(document).ready(function ($) {
             });
         }
 
+        showLinks(linkData) {
+            Object.values(linkData).forEach((value) => {
+                let when = value.when;
+                let link = $('#' + when + '_link');
+                link.html(value.url).attr('href', value.url);
+            })
+            this.sourceLinks.show();
+        }
+
+        fetchLinksToSource(image, testName) {
+            let self = this;
+            $.ajax({
+                type: "GET",
+                url: "/get_links",
+                data: $.param({
+                    test_name: testName,
+                    image: image
+                }),
+                processData: false,
+                success: function (data) {
+                    self.showLinks(data.results);
+                },
+                error: function (msg) {
+                    console.log(msg);
+                }
+            });
+
+        }
+
+        ajaxSetup() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        }
+
+        getQueryValue(key) {
+            let queryString = location.search;
+            let urlParams = new URLSearchParams(queryString);
+
+            return urlParams.get(key);
+        }
+
         redirect(queryString) {
             location = location.origin + location.pathname + queryString;
         }
@@ -149,22 +180,6 @@ $(document).ready(function ($) {
                 before: null,
                 after: null
             };
-        }
-
-        // Retrieve binary file data and process it
-        fetchBinaryFileData(filename, imgSrc, when) {
-            let self = this;
-
-            fetch(imgSrc)
-                .then(res => res.blob())
-                .then(blob => {
-                    self.fileData[when] = new File([blob], name, blob)
-
-                    if (self.fileData.before && self.fileData.after) {
-                        self.fileData.name = filename;
-                        self.compareWithResembleJs();
-                    }
-                });
         }
 
         createImageCollection() {
@@ -187,6 +202,22 @@ $(document).ready(function ($) {
             this.imageCollection = collection;
         }
 
+        // Retrieve binary file data and process it
+        fetchBinaryFileData(filename, imgSrc, when) {
+            let self = this;
+
+            fetch(imgSrc)
+                .then(res => res.blob())
+                .then(blob => {
+                    self.fileData[when] = new File([blob], name, blob)
+
+                    if (self.fileData.before && self.fileData.after) {
+                        self.fileData.name = filename;
+                        self.compareWithResembleJs();
+                    }
+                });
+        }
+
         prepareDataForComparison(imageData) {
             let beforeImage = imageData['before']['url'];
             let afterImage = imageData['after']['url'];
@@ -194,6 +225,7 @@ $(document).ready(function ($) {
 
             this.diffImage.html('');
             this.comparing.html('Comparing: ' + name);
+            this.fetchLinksToSource(name, this.currentTestName);
             this.clearButton.show();
             this.diffMessage.show();
             this.loading.show();
@@ -289,6 +321,7 @@ $(document).ready(function ($) {
                 });
                 self.comparing.empty();
                 self.diffMessage.hide();
+                self.sourceLinks.hide();
                 self.clearButton.hide();
                 self.screenshotList.val('');
             });
@@ -299,7 +332,7 @@ $(document).ready(function ($) {
             });
 
             this.resultsButton.on('click', function () {
-                self.getResults();
+                self.showResultsDialog();
             });
         }
     }

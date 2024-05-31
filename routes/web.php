@@ -6,6 +6,7 @@ use App\Http\Controllers\DiffController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CommandController;
 use App\Models\ComparisonResult;
+use App\Models\PageLink;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -46,6 +47,13 @@ Route::get('/images', function () {
 });
 
 Route::get('/dev', function () {
+    $image = 'covid19-resources.png';
+    $source = 'Sites_05-30-24';
+    $results = PageLink::where('image', $image)
+        ->where('test_name', $source)
+        ->get();
+
+    !d($results);
 
     // Do what thou wilt
 });
@@ -60,6 +68,7 @@ Route::get('/differ', function () {
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::get('/get_results', [DiffController::class, 'getResults']);
+Route::get('/get_links', [DiffController::class, 'getLinks']);
 Route::post('/save_results', [DiffController::class, 'saveComparison']);
 
 Route::get('/command', [CommandController::class, 'index'])->name('command');

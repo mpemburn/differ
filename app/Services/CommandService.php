@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Facades\Reader;
+use App\Models\PageLink;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Session;
 
@@ -81,6 +82,13 @@ class CommandService
 
             $url = $this->setAuth($url);
             $service->login($url)->screenshot($url, $title);
+            PageLink::firstOrCreate([
+                'image' => $title . '.png',
+                'url' => $url,
+                'when' => $this->when,
+                'source_file' => $this->filename,
+                'test_name' => $this->testName,
+            ]);
         });
     }
 

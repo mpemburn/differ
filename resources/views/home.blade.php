@@ -65,7 +65,7 @@
                         After Screenshot
                     </div>
                 </div>
-                <div id="diff_area" class="col-md-6">
+                <div id="diff_area" class="col-md-8">
                     <div id="diff_image" class="image-zone">
                         Difference
                     </div>
@@ -73,6 +73,13 @@
                         Click on the image above to open in a new tab.
                         <div id="percentage"></div>
                         <div id="height_diff"></div>
+                    </div>
+                    <div id="source_links">
+                        <br>
+                        Source:<br>
+                        <span class="fw-bolder">Before:</span> <a id="before_link" href="" target="_blank"></a>
+                        <br>
+                        <span class="fw-bolder">After:</span> <a id="after_link" href="" target="_blank"></a>
                     </div>
                 </div>
             </div>
