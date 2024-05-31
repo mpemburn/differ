@@ -5,10 +5,11 @@
             <option value="{{ $file }}">{{ $file }}</option>
         @endforeach
     </select>
-    <input type="text" wire:model="name" placeholder="File name"/>
-    <label><input type="radio" wire:model="when" value="before">Before</label>
-    <label><input type="radio" wire:model="when" value="after">After</label>
+    <input type="text" wire:model="name" id="test_name" placeholder="File name"/>
+    <label><input type="radio" wire:model="when" name="when" value="before">Before</label>
+    <label><input type="radio" wire:model="when" name="when" value="after">After</label>
     <button class="btn btn-primary btn-sm float-right" wire:click="generate">Generate Command</button>
+    <button class="btn btn-primary btn-sm float-right" wire:click="run">Run Command</button>
 
     <div>
         @if($command)
@@ -19,6 +20,10 @@
         <span id="copied"></span>
         @endif
     </div>
+    <br>
+    <h4>Results:</h4>
+
+    <pre id="results"></pre>
 </div>
 <script>
     $(document).ready(function ($) {
@@ -33,7 +38,20 @@
             }, () => {
                 message.html('Failed to copy');
             });
+        })
 
-        });
+        @this.on('runCommand', () => {
+            let fileSelect = $('#files :selected');
+            let filename = fileSelect.text();
+            let when = $('input[name="when"]:checked').val();
+            let testName = $('#test_name').val();
+            let results = $('#results');
+
+            if (fileSelect.val() === '') {
+                return;
+            }
+
+            window.Commands.run(filename, testName, when, results);
+        })
     });
 </script>

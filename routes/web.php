@@ -72,6 +72,8 @@ Route::get('/get_links', [DiffController::class, 'getLinks']);
 Route::post('/save_results', [DiffController::class, 'saveComparison']);
 
 Route::get('/command', [CommandController::class, 'index'])->name('command');
+Route::get('/get_file_list', [CommandController::class, 'getFileList'])->name('get_file_list');
+Route::post('/execute', [CommandController::class, 'execute']);
 
 Auth::routes();
 

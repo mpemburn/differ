@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Illuminate\Support\Facades\Session;
 
-class Scanner extends Component
+class Commands extends Component
 {
     public string $file = '';
     public string $name = '';
@@ -45,6 +45,11 @@ class Scanner extends Component
         $this->dispatch('copyToClipboard');
     }
 
+    public function run()
+    {
+        $this->dispatch('runCommand');
+    }
+
     protected function makeName(string $filename): string
     {
         $date = Carbon::now()->format('-m-d-y');
@@ -55,7 +60,7 @@ class Scanner extends Component
 
     public function render()
     {
-        return view('livewire.scanner', [
+        return view('livewire.commands', [
             'files' => $this->service->getUrlFileList()
         ]);
     }

@@ -8,7 +8,7 @@
                     <div class="card">
                         <div class="card-header">{{ __('Generate Screenshot Command') }}</div>
                         <div class="card-body no-margin">
-                            <livewire:scanner/>
+                            <livewire:commands/>
                         </div>
                     </div>
                 </div>

@@ -26,12 +26,16 @@ class CommandService
     public function setFilename(string $filename): self
     {
         $this->filename = $filename;
-
-        $testUrls = Storage::path('public/URLs/' . $filename);
-        $this->urlArray = Reader::getContentsAsArray($testUrls);
+        $this->urlArray = $this->getUrlArray($filename);
 
         return $this;
     }
+    public function getUrlArray(string $filename): array
+    {
+        $testUrls = Storage::path('public/URLs/' . $filename);
+        return Reader::getContentsAsArray($testUrls);
+    }
+
 
     public function setTestName(string $testName): self
     {
@@ -71,8 +75,6 @@ class CommandService
                 return;
             }
 
-            Session::push('results', $url);
-
             if ($this->verbose) {
                 echo 'Scanning: ' . $url . PHP_EOL;
             }
@@ -90,6 +92,27 @@ class CommandService
                 'test_name' => $this->testName,
             ]);
         });
+    }
+
+    public function run(string $url): bool
+    {
+        $path = 'public/screenshots/' . $this->testName. '/' . $this->when;
+
+        $service = new BrowserScreenShotService($path);
+        $parts = parse_url($url);
+        $title = str_replace('/', '', $parts['path']);
+
+        $url = $this->setAuth($url);
+        $service->login($url)->screenshot($url, $title);
+        PageLink::firstOrCreate([
+            'image' => $title . '.png',
+            'url' => $url,
+            'when' => $this->when,
+            'source_file' => $this->filename,
+            'test_name' => $this->testName,
+        ]);
+
+        return true;
     }
 
     protected function setAuth(string $url): string
