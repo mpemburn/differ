@@ -4,12 +4,14 @@ $(document).ready(function ($) {
     class Commands {
         constructor() {
             this.urlArray = [];
+            this.filename = null;
             this.testName = null;
             this.when = null;
         }
 
         run(filename, testName, when, result) {
             let self = this;
+            this.filename = filename;
             this.testName = testName;
             this.when = when;
             this.results = results;
@@ -49,6 +51,7 @@ $(document).ready(function ($) {
                 url: "/execute",
                 data: $.param({
                     url: url,
+                    filename: this.filename,
                     testName: this.testName,
                     when: this.when,
                 }),

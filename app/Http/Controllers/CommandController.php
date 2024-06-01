@@ -25,10 +25,12 @@ class CommandController extends Controller
     public function execute(Request $request)
     {
         $url = request('url');
+        $filename = request('filename');
         $testName = request('testName');
         $when = request('when');
 
-        (new CommandService())->setTestName($testName)
+        (new CommandService())->setFilename($filename)
+            ->setTestName($testName)
             ->setWhen($when)
             ->run($url);
 
