@@ -36,6 +36,11 @@ option.hidden {
 
 #loading {
     display: none;
+    position: relative;
+    top: 6px;
+    content: url(https://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif);
+    max-width: 24px;
+    max-height: 24px;
 }
 
 #automate {
@@ -133,6 +138,10 @@ td[data-name] {
     &:hover {
         color: #0000ff;
     }
+}
+
+#command_results {
+    display: none;
 }
 
 .btn_copy {

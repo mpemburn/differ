@@ -3,6 +3,8 @@ $(document).ready(function ($) {
 
     class Commands {
         constructor() {
+            this.commandResults = $('#command_results');
+            this.loading = $('#loading');
             this.urlArray = [];
             this.filename = null;
             this.testName = null;
@@ -46,6 +48,9 @@ $(document).ready(function ($) {
             let self = this;
             this.ajaxSetup();
 
+            this.commandResults.show();
+            this.loading.show();
+
             $.ajax({
                 type: "POST",
                 url: "/execute",
@@ -58,6 +63,7 @@ $(document).ready(function ($) {
                 processData: false,
                 success: function (data) {
                     self.results.append(' —Done' + "\n");
+                    self.loading.hide();
                     self.iterateUrls();
                 },
                 error: function (msg) {

@@ -9,7 +9,9 @@
     <label><input type="radio" wire:model="when" name="when" value="before">Before</label>
     <label><input type="radio" wire:model="when" name="when" value="after">After</label>
     <button class="btn btn-primary btn-sm float-right" wire:click="generate">Generate Command</button>
-    <button class="btn btn-primary btn-sm float-right" wire:click="run">Run Command</button>
+    @if($command)
+        <button class="btn btn-primary btn-sm float-right" wire:click="run">Run Command</button>
+    @endif
 
     <div>
         @if($command)
@@ -21,9 +23,13 @@
         @endif
     </div>
     <br>
-    <h4>Results:</h4>
+    <div id="command_results">
+        <h4>Results: <span id="loading"></span></h4>
+        <pre id="results"></pre>
+    </div>
 
-    <pre id="results"></pre>
+
+
 </div>
 <script>
     $(document).ready(function ($) {

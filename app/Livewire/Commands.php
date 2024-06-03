@@ -14,6 +14,7 @@ class Commands extends Component
     public string $name = '';
     public string $when = '';
     public string $command = '';
+
     private CommandService $service;
 
     public function __construct()

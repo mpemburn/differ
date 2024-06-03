@@ -47,14 +47,6 @@ Route::get('/images', function () {
 });
 
 Route::get('/dev', function () {
-    $image = 'covid19-resources.png';
-    $source = 'Sites_05-30-24';
-    $results = PageLink::where('image', $image)
-        ->where('test_name', $source)
-        ->get();
-
-    !d($results);
-
     // Do what thou wilt
 });
 

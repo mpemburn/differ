@@ -36,10 +36,7 @@
                                     </option>
                                     @endforeach
                         </select>
-                        <img id="loading"
-                             src="https://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif" alt=""
-                             width="24"
-                             height="24">
+                        <span id="loading"></span>
                     @endif
                 </div>
             </div>
