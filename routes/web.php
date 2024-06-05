@@ -47,7 +47,7 @@ Route::get('/images', function () {
 });
 
 Route::get('/dev', function () {
-    // Do what thou wilt
+   // Do what thou wilt
 });
 
 Route::get('/', function () {

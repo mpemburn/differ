@@ -13,6 +13,7 @@ $(document).ready(function ($) {
             this.diffMessage = $('#diff_msg');
             this.comparing = $('#comparing');
             this.sourceLinks = $('#source_links');
+            this.titleArea = $('#title_area');
             this.clearButton = $('#clear_button');
             this.automateButton = $('#automate_button');
             this.resultsButton = $('#results_button');
@@ -42,6 +43,7 @@ $(document).ready(function ($) {
 
         runAutoMode() {
             let self = this;
+            this.titleArea.hide();
             this.iterateCollection();
         }
 
@@ -50,22 +52,24 @@ $(document).ready(function ($) {
             // Rebuild collection after autoMode has wiped it out.
             this.createImageCollection();
             this.showResultsDialog();
+            this.titleArea.show();
             this.resultsButton.show();
         }
 
         iterateCollection() {
             let imageName = Object.keys(this.imageCollection)[0];
             let imageData = Object.values(this.imageCollection)[0];
+            let isEmpty = Object.keys(this.imageCollection).length === 0;
 
             window.currentImage = imageName;
-            this.prepareDataForComparison(imageData);
+            if (! isEmpty) {
+                this.prepareDataForComparison(imageData);
+            } else {
+                this.haltAutoMode();
+            }
 
             // Remove this item from the collection
             delete this.imageCollection[imageName];
-
-            if (Object.keys(this.imageCollection).length === 0) {
-                this.haltAutoMode();
-            }
         }
 
         saveResults(filename, data) {
@@ -213,6 +217,8 @@ $(document).ready(function ($) {
 
                     if (self.fileData.before && self.fileData.after) {
                         self.fileData.name = filename;
+                        console.log(filename);
+
                         self.compareWithResembleJs();
                     }
                 });
