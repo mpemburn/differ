@@ -2,6 +2,7 @@
 
 use App\Facades\Image;
 use App\Facades\Reader;
+use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\DiffController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CommandController;
@@ -25,6 +26,13 @@ use Illuminate\Support\Facades\Storage;
 |
 */
 
+Route::get('/dev', function () {
+    $directories = (new \App\Services\ArchiveService())->buildScreenshotsSelect();
+//    !d($directories);
+    dd($directories);
+    // Do what thou wilt
+});
+
 Route::get('/num', function () {
     $nums = Storage::path('public/dirs.txt');
     if (file_exists($nums)) {
@@ -46,11 +54,6 @@ Route::get('/images', function () {
     dd($files);
 });
 
-Route::get('/dev', function () {
-    phpinfo();
-   // Do what thou wilt
-});
-
 Route::get('/', function () {
     return view('welcome');
 });
@@ -68,6 +71,8 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/command', [CommandController::class, 'index'])->name('command');
     Route::get('/get_file_list', [CommandController::class, 'getFileList'])->name('get_file_list');
     Route::post('/execute', [CommandController::class, 'execute']);
+
+    Route::get('/archive', [ArchiveController::class, 'index'])->name('archive');
 });
 
 Auth::routes();

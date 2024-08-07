@@ -154,3 +154,17 @@ td[data-name] {
     position: relative;
     top: -1px;
 }
+
+/* Archive */
+.archive-select {
+    height: auto;
+    padding: 5px;
+}
+button.archive {
+    min-width: 8rem;
+    margin-bottom: 0.5rem;
+}
+#confirm_move {
+    visibility: hidden;
+    text-align: center;
+}

@@ -4,3 +4,6 @@
 <li class="nav-item">
     <a class="nav-link @if(Route::currentRouteName() == 'command') active @endif" href="{{ route('command') }}">Commands</a>
 </li>
+<li class="nav-item">
+    <a class="nav-link @if(Route::currentRouteName() == 'archive') active @endif" href="{{ route('archive') }}">Archive</a>
+</li>
