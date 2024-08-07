@@ -113,6 +113,8 @@ class BrowserScreenShotService
             // Save the image
             Storage::disk('local')->put($this->saveDirectory . '/' . $filename, $image);
 
+            $this->browser->quit();
+
             return file_exists($filePath);
         } catch (\Exception $e) {
             echo 'Exception occurred creating screenshot for ' . $url . PHP_EOL;
