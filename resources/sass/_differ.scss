@@ -156,6 +156,9 @@ td[data-name] {
 }
 
 /* Archive */
+.archive-controls {
+    padding-top: 2.2rem;
+}
 .archive-select {
     height: auto;
     padding: 5px;
@@ -163,6 +166,16 @@ td[data-name] {
 button.archive {
     min-width: 8rem;
     margin-bottom: 0.5rem;
+}
+button.delete {
+    min-width: 8rem;
+    margin-top: 13.5rem;
+    background-color: #cc0000;
+    border-color: #cc0000;
+    &:hover {
+        background-color: #ff0000;
+        border-color: #ff0000;
+    }
 }
 #confirm_move {
     text-align: center;

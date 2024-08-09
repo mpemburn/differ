@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,6 +10,14 @@ class ArchiveService
 {
     public const SCREENSHOT_PATH = '/screenshots/';
     public const ARCHIVE_PATH = '/screenshots/Archived/';
+
+    public static function directoryFromPath(string $path): string
+    {
+        return str_replace([
+            'public' . self::ARCHIVE_PATH,
+            'public' . self::SCREENSHOT_PATH
+        ], '', $path);
+    }
 
     public function archive(string $screenshot): ?string
     {
@@ -56,6 +63,13 @@ class ArchiveService
             Storage::deleteDirectory($destinationPath);
         }
         Storage::move($tempPath, $destinationPath);
+    }
+
+    public function deleteSelected(array $selected): void
+    {
+        foreach ($selected as $directory) {
+            Storage::deleteDirectory($directory);
+        }
     }
 
     protected function setDestinationPath(string $sourcePath): string
