@@ -1,6 +1,6 @@
 <div class="row justify-content-center">
     <div id="selects_area" class="row">
-        <div class="col-2">
+        <div class="col-2 col-sm-auto">
             <h4>Screenshots</h4>
             <select
                 wire:model="screenshotsSelected"
@@ -26,7 +26,7 @@
                 <button wire:click="confirmDelete" class="btn btn-primary btn-sm delete">Delete</button>
             </div>
         </div>
-        <div class="col-2">
+        <div class="col-2 col-sm-auto">
             <h4>Archives</h4>
             <select
                 wire:model="archivesSelected"
