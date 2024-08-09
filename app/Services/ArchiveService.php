@@ -3,14 +3,18 @@
 namespace App\Services;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ArchiveService
 {
+    public const SCREENSHOT_PATH = '/screenshots/';
+    public const ARCHIVE_PATH = '/screenshots/Archived/';
 
     public function archive(string $screenshot): ?string
     {
-        $archiveLocation = str_replace('/screenshots/', '/screenshots/Archived/', $screenshot);
+        $archiveLocation = str_replace(self::SCREENSHOT_PATH, self::ARCHIVE_PATH, $screenshot);
         if (Storage::exists($archiveLocation)) {
             return $screenshot;
         }
@@ -22,7 +26,7 @@ class ArchiveService
 
     public function unarchive(string $archive): ?string
     {
-        $screenshotLocation = str_replace('/screenshots/Archived/', '/screenshots/', $archive);
+        $screenshotLocation = str_replace(self::ARCHIVE_PATH, self::SCREENSHOT_PATH, $archive);
         if (Storage::exists($screenshotLocation)) {
             return $archive;
         }
@@ -30,6 +34,36 @@ class ArchiveService
         Storage::move($archive, $screenshotLocation);
 
         return null;
+    }
+
+    public function keepBoth(string $sourcePath): void
+    {
+        $copy = $sourcePath . '-copy';
+        Storage::move($sourcePath, $copy);
+        $destinationPath = $this->setDestinationPath($sourcePath);
+        $destinationPath .=  '-copy';
+        Storage::move($copy, $destinationPath);
+    }
+
+    public function replace(string $sourcePath): void
+    {
+        $destinationPath = $this->setDestinationPath($sourcePath);
+        $tempPath = $destinationPath . '-temp';
+        Storage::move($sourcePath, $tempPath);
+        sleep(1);
+        if (Storage::exists($destinationPath)) {
+            Log::debug(storage_path($destinationPath));
+            Storage::deleteDirectory($destinationPath);
+        }
+        Storage::move($tempPath, $destinationPath);
+    }
+
+    protected function setDestinationPath(string $sourcePath): string
+    {
+        return str_contains($sourcePath, self::ARCHIVE_PATH)
+            ? str_replace(self::ARCHIVE_PATH, self::SCREENSHOT_PATH, $sourcePath)
+            : str_replace(self::SCREENSHOT_PATH, self::ARCHIVE_PATH, $sourcePath);
+
     }
 
     public function listScreenshots(): Collection
@@ -56,7 +90,7 @@ class ArchiveService
 
     public function listAll(): Collection
     {
-        $directories = Storage::allDirectories('public/screenshots');
+        $directories = Storage::allDirectories('public' . self::SCREENSHOT_PATH);
 
         $list = collect($directories)->map(function ($directory) {
             if (
@@ -74,12 +108,12 @@ class ArchiveService
 
     public function buildScreenshotsSelect(): array
     {
-        return $this->buildSelect($this->listScreenshots(), 'public/screenshots/');
+        return $this->buildSelect($this->listScreenshots(), 'public' . self::SCREENSHOT_PATH);
     }
 
     public function buildArchivedSelect(): array
     {
-        return $this->buildSelect($this->listArchived(), 'public/screenshots/Archived/');
+        return $this->buildSelect($this->listArchived(), 'public' . self::ARCHIVE_PATH);
     }
 
     protected function buildSelect(Collection $list, string $path): array

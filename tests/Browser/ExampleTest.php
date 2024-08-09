@@ -19,8 +19,8 @@ class ExampleTest extends DuskTestCase
             $browser->visit('https://news.test.clarku.edu/academic-affairs')
                 ->assertSee('Sign in with your organizational account');
 
-            $browser->type('UserName', 'mpemburn@clarku.edu')
-                ->type('Password', 'wildPl@nner')
+            $browser->type('UserName', '')
+                ->type('Password', '')
                 ->press('#submitButton')
                 ->pause(3000);
         });

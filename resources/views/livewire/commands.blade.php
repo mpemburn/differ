@@ -6,8 +6,9 @@
         @endforeach
     </select>
     <input type="text" wire:model="name" id="test_name" placeholder="File name"/>
-    <label><input type="radio" wire:model="when" name="when" value="before">Before</label>
-    <label><input type="radio" wire:model="when" name="when" value="after">After</label>
+    <label><input type="radio" wire:model="when" name="when" value="before">&nbsp;Before</label>
+    <label><input type="radio" wire:model="when" name="when" value="after">&nbsp;After</label>
+    <label><input type="checkbox" wire:model="auth" name="auth">&nbsp;Requires Auth</label>
     <button class="btn btn-primary btn-sm float-right" wire:click="generate">Generate Command</button>
     @if($command)
         <button class="btn btn-primary btn-sm float-right" wire:click="run">Run Command</button>

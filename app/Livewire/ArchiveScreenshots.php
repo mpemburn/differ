@@ -14,6 +14,7 @@ class ArchiveScreenshots extends Component
         'refresh-event' => '$refresh'
     ];
     protected ArchiveService $archiveService;
+    public string $sourcePath;
 
     public array $screenshotsSelected;
     public array $archivesSelected;
@@ -29,8 +30,7 @@ class ArchiveScreenshots extends Component
         foreach ($this->screenshotsSelected as $screenshot) {
             $response = $this->archiveService->archive($screenshot);
             if ($response) {
-                $this->confirmMove = $response;
-                $this->dispatch('openConfirmMoveModal');
+                $this->confirm($response);
             }
         }
 
@@ -42,7 +42,10 @@ class ArchiveScreenshots extends Component
     public function unarchive(): void
     {
         foreach ($this->archivesSelected as $archive) {
-            $this->archiveService->unarchive($archive);
+            $response = $this->archiveService->unarchive($archive);
+            if ($response) {
+                $this->confirm($response);
+            }
         }
 
         $this->archivesSelected = [];
@@ -50,19 +53,31 @@ class ArchiveScreenshots extends Component
         $this->dispatch('refresh-event');
     }
 
-    public function keep()
+    protected function confirm(string $path): void
     {
+        $this->sourcePath = $path;
+        $parts = explode('/', $path);
+        $name = array_pop($parts);
+        $this->confirmMove = $name;
 
+        $this->dispatch('openConfirmMoveModal');
     }
 
-    public function stop()
+    public function keep(): void
     {
-
+        $this->archiveService->keepBoth($this->sourcePath);
+        $this->dispatch('closeConfirmMoveModal');
     }
 
-    public function replace()
+    public function stop(): void
     {
+        $this->dispatch('closeConfirmMoveModal');
+    }
 
+    public function replace(): void
+    {
+        $this->archiveService->replace($this->sourcePath);
+        $this->dispatch('closeConfirmMoveModal');
     }
 
     public function render()

@@ -14,6 +14,7 @@ class Commands extends Component
     public string $name = '';
     public string $when = '';
     public string $command = '';
+    public string $auth = '';
 
     private CommandService $service;
 
@@ -28,6 +29,7 @@ class Commands extends Component
         $this->name = $name;
         $this->command = '';
         $this->when = '';
+        $this->auth = false;
     }
 
     public function generate(): void
@@ -38,7 +40,8 @@ class Commands extends Component
             return;
         }
 
-        $this->command = "php artisan app:scanurls --test={$this->file} --name={$this->name} --when={$this->when}";
+        $requiresAuth = $this->auth === '1' ? ' --auth="true"' : '';
+        $this->command = "php artisan app:scanurls --test={$this->file} --name={$this->name} --when={$this->when} {$requiresAuth}";
     }
 
     public function copy()
