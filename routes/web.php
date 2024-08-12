@@ -6,6 +6,7 @@ use App\Http\Controllers\ArchiveController;
 use App\Http\Controllers\DiffController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CommandController;
+use App\Http\Controllers\SourceFilesController;
 use App\Models\ComparisonResult;
 use App\Models\PageLink;
 use Illuminate\Support\Carbon;
@@ -27,7 +28,7 @@ use Illuminate\Support\Facades\Storage;
 */
 
 Route::get('/dev', function () {
-    $directories = (new \App\Services\ArchiveService())->buildScreenshotsSelect();
+    $directories = (new \App\Services\SourceFilesService())->listSources();
 //    !d($directories);
     dd($directories);
     // Do what thou wilt
@@ -73,6 +74,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::post('/execute', [CommandController::class, 'execute']);
 
     Route::get('/archive', [ArchiveController::class, 'index'])->name('archive');
+    Route::get('/sources', [SourceFilesController::class, 'index'])->name('sources');
 });
 
 Auth::routes();

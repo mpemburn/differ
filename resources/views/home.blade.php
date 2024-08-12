@@ -73,7 +73,7 @@
                     </div>
                     <div id="source_links">
                         <br>
-                        Source URLs:<br>
+                        Sources:<br>
                         <span class="fw-bolder">Before:</span> <a id="before_link" href="" target="_blank"></a>
                         <br>
                         <span class="fw-bolder">After:</span> <a id="after_link" href="" target="_blank"></a>

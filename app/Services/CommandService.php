@@ -18,9 +18,9 @@ class CommandService
 
     public function getUrlFileList(): array
     {
-        $files = Storage::disk('public')->files('URLs');
+        $files = Storage::disk('public')->files('sources');
 
-        return preg_filter(['/URLs\//'], [''], $files);
+        return preg_filter(['/sources\//'], [''], $files);
     }
 
     public function setFilename(string $filename): self
@@ -32,7 +32,7 @@ class CommandService
     }
     public function getUrlArray(string $filename): array
     {
-        $testUrls = Storage::path('public/URLs/' . $filename);
+        $testUrls = Storage::path('public/sources/' . $filename);
         return Reader::getContentsAsArray($testUrls);
     }
 

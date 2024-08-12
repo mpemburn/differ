@@ -86,6 +86,7 @@ class ArchiveScreenshots extends Component
 
     protected function confirm(string $path): void
     {
+        $this->sourcePath = $path;
         $this->confirmMove = ArchiveService::directoryFromPath($path);
 
         $this->dispatch('openConfirmMoveModal');
