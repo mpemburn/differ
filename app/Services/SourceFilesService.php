@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Facades\Reader;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,6 +19,18 @@ class SourceFilesService
         })->sort();
 
         return $list;
+    }
+
+    public function hasDifferentContents(string $filename, string $contents): bool
+    {
+        $existingFile = Storage::path(self::SOURCES_PATH . $filename);
+        $existingContents = Reader::contents($existingFile);
+
+        if ($existingContents) {
+            return $contents !== $existingContents;
+        }
+
+        return true;
     }
 
 }

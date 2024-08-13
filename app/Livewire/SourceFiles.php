@@ -10,9 +10,14 @@ use Livewire\Component;
 
 class SourceFiles extends Component
 {
+    protected $listeners = [
+        'refresh-event' => '$refresh'
+    ];
     public string $sourceName;
+    public string $initialContents;
     public string $editor;
     public bool $loading = true;
+    public bool $canSave = false;
     public bool $showNewButton = true;
     public bool $showDeleteButton = false;
     protected SourceFilesService $service;
@@ -21,20 +26,26 @@ class SourceFiles extends Component
     {
         $this->service = new SourceFilesService();
     }
-    public function editSource()
+    public function editSource(): void
     {
         $filename = Storage::path(SourceFilesService::SOURCES_PATH . $this->sourceName);
         $this->editor = Reader::contents($filename);
+        $this->initialContents = $this->editor;
         $this->showDeleteButton = true;
     }
 
-    public function newSource()
+    public function newSource(): void
     {
         $this->clear();
         $this->dispatch('focusTitle');
     }
 
-    public function save()
+    public function hasChanged(): void
+    {
+        $this->canSave = $this->initialContents !== $this->editor;
+    }
+
+    public function save(): void
     {
         $this->loading = true;
         Storage::put(SourceFilesService::SOURCES_PATH . $this->sourceName, $this->editor);
@@ -42,14 +53,14 @@ class SourceFiles extends Component
         $this->loading = false;
     }
 
-    public function clear()
+    public function clear(): void
     {
         $this->sourceName = '';
         $this->editor = '';
         $this->showDeleteButton = false;
     }
 
-    public function confirmDelete()
+    public function confirmDelete(): void
     {
         Log::debug($this->sourceName);
         $this->dispatch('openConfirmDeleteModal');
@@ -60,7 +71,7 @@ class SourceFiles extends Component
         $this->dispatch('closeConfirmDeleteModal');
     }
 
-    public function delete()
+    public function delete(): void
     {
         $this->dispatch('closeConfirmDeleteModal');
     }

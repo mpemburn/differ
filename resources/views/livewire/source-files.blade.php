@@ -7,7 +7,7 @@
             @endforeach
         </select>
         <input type="text" wire:model="sourceName" data-name="sourceName" placeholder="Source name">
-        <button class="btn btn-primary btn-sm" wire:click="save">Save</button>
+        <button class="btn btn-primary btn-sm" wire:click="save" {{ $canSave ? '' : 'disabled' }}>Save</button>
         <button class="btn btn-primary btn-sm float-right" wire:click="clear">Clear</button>
         @if($showNewButton)
             <button class="btn btn-primary btn-sm" wire:click="newSource" wire:click="focusTitle">New</button>
@@ -25,7 +25,7 @@
         </div>
     </div>
     <div id="editor">
-        <textarea id="source_editor" wire:model="editor" placeholder="List of URLs"></textarea>
+        <textarea id="source_editor" wire:model="editor" wire:keydown="hasChanged" placeholder="List of URLs"></textarea>
     </div>
     @include('dialogs.confirm-delete', ['type' => 'sources'])
 </div>
@@ -44,6 +44,7 @@
         @this.on('focusTitle', () => {
             $('[data-name="sourceName"]').focus();
         });
+
     });
 
 </script>
