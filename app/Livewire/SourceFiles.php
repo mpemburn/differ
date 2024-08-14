@@ -77,6 +77,7 @@ class SourceFiles extends Component
         $this->sourceName = '';
         $this->editor = '';
         $this->showDeleteButton = false;
+        $this->canSave = false;
         $this->hasMessage = false;
     }
 
