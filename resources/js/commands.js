@@ -36,15 +36,18 @@ $(document).ready(function ($) {
         }
 
         iterateUrls() {
-            let url = this.urlArray.shift();
-            if (this.urlArray.length === 0 || url === '') {
+            if (this.urlArray.length === 0) {
                 return;
             }
+            let url = this.urlArray.shift();
             this.results.append(url);
             this.executeCommand(url);
         }
 
         executeCommand(url) {
+            if (url === '') {
+                return;
+            }
             let self = this;
             this.ajaxSetup();
 
