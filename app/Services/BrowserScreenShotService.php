@@ -17,9 +17,12 @@ use Laravel\Dusk\Browser;
 use Laravel\Dusk\Chrome\ChromeProcess;
 use Symfony\Component\Process\Exception\RuntimeException;
 use Facebook\WebDriver\Exception\UnknownErrorException;
+use Tests\CreatesApplication;
 
 class BrowserScreenShotService
 {
+    use CreatesApplication;
+
     const DEFAULT_BROWSER_WIDTH = 1920;
     const OPTIONS = [
         '--headless',
@@ -49,7 +52,7 @@ class BrowserScreenShotService
             $options = (new ChromeOptions)->addArguments(self::OPTIONS);
             $capabilities = DesiredCapabilities::chrome()->setCapability(ChromeOptions::CAPABILITY, $options);
             $this->driver = retry(5, function () use($capabilities) {
-                return RemoteWebDriver::create('http://localhost:9515', $capabilities);
+                return RemoteWebDriver::create('https://differ.test:9515', $capabilities);
             }, 50);
 
             $this->browser = new Browser($this->driver);

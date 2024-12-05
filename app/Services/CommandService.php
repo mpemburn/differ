@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Facades\Reader;
 use App\Models\PageLink;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Session;
 
 class CommandService
 {
@@ -68,7 +67,7 @@ class CommandService
     public function scan(): void
     {
         $path = 'public/screenshots/' . $this->testName. '/' . $this->when;
-        $service = new BrowserScreenShotService($path);
+        $service = new BrowserShotService($path);
 
         collect($this->urlArray)->each(function ($url) use ($service) {
             if (! str_starts_with($url, 'https')) {
@@ -96,14 +95,14 @@ class CommandService
 
     public function run(string $url): bool
     {
-        $path = 'public/screenshots/' . $this->testName. '/' . $this->when;
+        $path = $this->testName. '/' . $this->when;
 
-        $service = new BrowserScreenShotService($path);
+        $service = new BrowserShotService($path);
         $parts = parse_url($url);
         $title = str_replace('/', '', $parts['path']);
 
         $url = $this->setAuth($url);
-        $service->login($url)->screenshot($url, $title);
+        $service->screenshot($url, $title);
         PageLink::firstOrCreate([
             'image' => $title . '.png',
             'url' => $url,

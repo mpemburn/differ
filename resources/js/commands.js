@@ -48,6 +48,8 @@ $(document).ready(function ($) {
             if (url === '') {
                 return;
             }
+            console.log('~~~~~~~~~~~~~~~~~~~~~~~');
+            console.log(url);
             let self = this;
             this.ajaxSetup();
 
@@ -75,6 +77,21 @@ $(document).ready(function ($) {
             });
 
         }
+
+        getScreenHeight(url) {
+            let body = document.body;
+            let html = document.documentElement;
+            let totalHeight = Math.max(
+                body.scrollHeight,
+                body.offsetHeight,
+                html.clientHeight,
+                html.scrollHeight,
+                html.offsetHeight
+            );
+
+            return {height: totalHeight};
+        }
+
         ajaxSetup() {
             $.ajaxSetup({
                 headers: {

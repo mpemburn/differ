@@ -28,9 +28,12 @@ use Illuminate\Support\Facades\Storage;
 */
 
 Route::get('/dev', function () {
-    $directories = (new \App\Services\SourceFilesService())->listSources();
-//    !d($directories);
-    dd($directories);
+    $url = 'https://www.uraniaswell.com/the-astronomy-of-astrology/';
+    $path = 'Uraniaswell-12-05-24/before';
+    $parts = parse_url($url);
+
+    $title = str_replace('/', '', $parts['path']);
+    (new \App\Services\BrowserShotService($path))->screenshot($url, $title);
     // Do what thou wilt
 });
 
